@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ButtonMembership extends StatelessWidget {
   final VoidCallback onPressed;
@@ -23,40 +24,49 @@ class ButtonMembership extends StatelessWidget {
         children: [
           SizedBox(
             width: screenWidth * 0.9,
-            child: FloatingActionButton.extended(
-              elevation: 0,
-              onPressed: onPressed,
-              backgroundColor: backgroundColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              label: Padding(
-                padding: EdgeInsets.all(12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Upgrade to ',
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.06,
-                        color: textColor,
-                      ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final textScaleFactor = constraints.maxWidth * 0.0025;
+                return FloatingActionButton.extended(
+                  elevation: 0,
+                  onPressed: onPressed,
+                  backgroundColor: backgroundColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  label: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Upgrade to ',
+                          style: GoogleFonts.poppins(
+                            fontSize: screenWidth * 0.06 * textScaleFactor,
+                            color: textColor,
+                          ),
+                        ),
+                        Image.asset(
+                          'assets/images/membershipIcon.png',
+                          height: screenWidth * 0.09 * textScaleFactor,
+                        ),
+                        // Icon(
+                        //   Icons.star,
+                        //   color: textColor,
+                        //   size: screenWidth * 0.08,
+                        // ),
+                        Text(
+                          ' Membership',
+                          style: GoogleFonts.poppins(
+                            fontSize: screenWidth * 0.06 * textScaleFactor,
+                            color: textColor,
+                          ),
+                        ),
+                      ],
                     ),
-                    Icon(
-                      Icons.star,
-                      color: textColor,
-                      size: screenWidth * 0.08,
-                    ),
-                    Text(
-                      ' Membership',
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.06,
-                        color: textColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
           ),
         ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomButton1 extends StatelessWidget {
   final String title;
@@ -7,7 +8,6 @@ class CustomButton1 extends StatelessWidget {
   final Color colorText;
   final double buttonWidth;
   final double buttonHeight;
-  final double? fontSize;
   const CustomButton1({
     Key? key,
     required this.title,
@@ -16,7 +16,6 @@ class CustomButton1 extends StatelessWidget {
     required this.colorText,
     required this.buttonWidth,
     required this.buttonHeight,
-    this.fontSize,
   }) : super(key: key);
 
   @override
@@ -41,13 +40,17 @@ class CustomButton1 extends StatelessWidget {
       onPressed: onPressed,
       child: Container(
         alignment: Alignment.center,
-        child: Text(
-          title,
-          style: TextStyle(
-            color: colorText,
-            fontSize: fontSize ??
-                screenHeight * 0.025, // Ukuran font 2.5% dari tinggi layar
-          ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final sizeHeight = constraints.maxHeight;
+            return Text(
+              title,
+              style: GoogleFonts.poppins(
+                color: colorText,
+                fontSize: sizeHeight * 0.35,
+              ),
+            );
+          },
         ),
       ),
     );

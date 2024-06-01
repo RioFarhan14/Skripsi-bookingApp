@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:user_frontend/utils/theme.dart';
 
 class CustomTextField1 extends StatelessWidget {
   const CustomTextField1({
@@ -11,9 +13,11 @@ class CustomTextField1 extends StatelessWidget {
     this.onChanged,
     required this.fieldHeight,
     required this.fieldWidth,
+    this.color,
     this.prefixIcon,
     this.fontSize,
     this.onTap,
+    this.backgroundColor,
     this.readOnly = false,
     this.enabled = true, // Tambahkan parameter enabled
     this.inputFormatters, // Tambahkan parameter inputFormatters
@@ -30,6 +34,8 @@ class CustomTextField1 extends StatelessWidget {
   final bool enabled; // Definisikan parameter enabled
   final VoidCallback? onTap;
   final bool readOnly;
+  final Color? color;
+  final Color? backgroundColor;
   final List<TextInputFormatter>?
       inputFormatters; // Definisikan parameter inputFormatters
 
@@ -38,9 +44,16 @@ class CustomTextField1 extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    return SizedBox(
+    return Container(
       height: screenHeight * fieldHeight,
       width: screenWidth * fieldWidth,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(screenHeight * 0.015),
+          bottomRight: Radius.circular(screenHeight * 0.015),
+        ),
+        color: backgroundColor ?? null,
+      ),
       child: TextField(
         controller: controller,
         inputFormatters: inputFormatters, // Gunakan inputFormatters di sini
@@ -50,7 +63,9 @@ class CustomTextField1 extends StatelessWidget {
         onTap: onTap,
         readOnly: readOnly,
         enabled: enabled, // Gunakan nilai parameter enabled
-        style: TextStyle(fontSize: fontSize ?? screenHeight * 0.022),
+        style: GoogleFonts.poppins(
+            fontSize: fontSize ?? screenHeight * 0.022,
+            color: color ?? blackColor),
         decoration: InputDecoration(
           prefixIcon: prefixIcon != null
               ? Align(

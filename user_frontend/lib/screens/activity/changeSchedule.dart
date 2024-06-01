@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:user_frontend/providers/bookingProvider.dart';
+import 'package:user_frontend/utils/customAppBar.dart';
 import 'package:user_frontend/utils/customBotton1.dart';
 import 'package:user_frontend/utils/customTextField1.dart';
+import 'package:user_frontend/utils/theme.dart';
 
 class ChangeSchedule extends StatefulWidget {
-  final DateTime initialDate;
-  final TimeOfDay initialTime;
-
-  const ChangeSchedule({
-    Key? key,
-    required this.initialDate,
-    required this.initialTime,
-  }) : super(key: key);
+  const ChangeSchedule({Key? key}) : super(key: key);
 
   @override
   _ChangeScheduleState createState() => _ChangeScheduleState();
@@ -20,12 +18,22 @@ class ChangeSchedule extends StatefulWidget {
 class _ChangeScheduleState extends State<ChangeSchedule> {
   late DateTime selectedDate;
   late TimeOfDay selectedTime;
+  bool isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    selectedDate = widget.initialDate;
-    selectedTime = widget.initialTime;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final bookingId = ModalRoute.of(context)!.settings.arguments as int;
+      final booking = Provider.of<BookingProvider>(context, listen: false)
+          .bookings
+          .firstWhere((booking) => booking.id == bookingId);
+      setState(() {
+        selectedDate = booking.schedule;
+        selectedTime = booking.clock;
+        isInitialized = true;
+      });
+    });
   }
 
   @override
@@ -33,33 +41,22 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
+    if (!isInitialized) {
+      return Scaffold(
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(screenHeight * 0.1),
+          child: const CustomAppBar(title: 'Ubah Jadwal'),
+        ),
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        leadingWidth: screenWidth * 0.16,
-        leading: Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.black),
-            ),
-            child: GestureDetector(
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                size: screenHeight * 0.04,
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-        ),
-        toolbarHeight: screenHeight * 0.1,
-        title: Text(
-          'Ubah Jadwal',
-          style: TextStyle(fontSize: screenHeight * 0.03),
-        ),
-        centerTitle: true,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(screenHeight * 0.1),
+        child: const CustomAppBar(title: 'Ubah Jadwal'),
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -68,7 +65,7 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
             width: screenWidth * 0.85,
             height: screenHeight * 0.6,
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: darkBlueColor,
               borderRadius: BorderRadius.circular(screenWidth * 0.02),
             ),
             child: Padding(
@@ -80,25 +77,29 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       FaIcon(
+                        color: orangeColor,
                         FontAwesomeIcons.calendarCheck,
                         size: screenWidth * 0.1,
                       ),
                       SizedBox(width: screenWidth * 0.04),
                       Text(
                         'Pesanan',
-                        style: TextStyle(fontSize: screenWidth * 0.06),
+                        style: GoogleFonts.poppins(
+                            color: whiteColor, fontSize: screenWidth * 0.06),
                       ),
                     ],
                   ),
                   SizedBox(height: screenHeight * 0.03),
                   Text(
                     'Nama Lapangan',
-                    style: TextStyle(fontSize: screenWidth * 0.055),
+                    style: GoogleFonts.poppins(
+                        color: whiteColor, fontSize: screenWidth * 0.055),
                   ),
                   SizedBox(height: screenHeight * 0.003),
                   Text(
                     'Lapangan A',
-                    style: TextStyle(fontSize: screenWidth * 0.045),
+                    style: GoogleFonts.poppins(
+                        color: whiteColor, fontSize: screenWidth * 0.045),
                   ),
                   SizedBox(height: screenHeight * 0.03),
                   Row(
@@ -108,13 +109,16 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           FaIcon(
+                            color: orangeColor,
                             FontAwesomeIcons.calendar,
                             size: screenWidth * 0.08,
                           ),
                           SizedBox(width: screenWidth * 0.02),
                           Text(
-                            '${widget.initialDate.day}-${widget.initialDate.month}-${widget.initialDate.year}',
-                            style: TextStyle(fontSize: screenWidth * 0.04),
+                            '${selectedDate.day}-${selectedDate.month}-${selectedDate.year}',
+                            style: GoogleFonts.poppins(
+                                color: whiteColor,
+                                fontSize: screenWidth * 0.04),
                           ),
                         ],
                       ),
@@ -124,13 +128,16 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             FaIcon(
+                              color: orangeColor,
                               FontAwesomeIcons.clock,
                               size: screenWidth * 0.08,
                             ),
                             SizedBox(width: screenWidth * 0.02),
                             Text(
-                              '${widget.initialTime.hour}:${widget.initialTime.minute.toString().padLeft(2, '0')}',
-                              style: TextStyle(fontSize: screenWidth * 0.04),
+                              '${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}',
+                              style: GoogleFonts.poppins(
+                                  color: whiteColor,
+                                  fontSize: screenWidth * 0.04),
                             ),
                           ],
                         ),
@@ -141,11 +148,13 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                   Row(
                     children: [
                       CustomTextField1(
+                        backgroundColor: whiteColor,
                         fontSize: screenWidth * 0.03,
                         fieldHeight: 0.05,
                         fieldWidth: 0.35,
                         keyboardType: TextInputType.datetime,
-                        prefixIcon: FaIcon(FontAwesomeIcons.calendar),
+                        prefixIcon: FaIcon(
+                            color: orangeColor, FontAwesomeIcons.calendar),
                         enabled: false,
                         controller: TextEditingController(
                           text:
@@ -158,11 +167,10 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                         onPressed: () {
                           _selectDate(context);
                         },
-                        backgroundColor: Colors.green,
+                        backgroundColor: orangeColor,
                         colorText: Colors.white,
                         buttonWidth: 0.28,
                         buttonHeight: 0.05,
-                        fontSize: screenWidth * 0.025,
                       ),
                     ],
                   ),
@@ -170,11 +178,13 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                   Row(
                     children: [
                       CustomTextField1(
+                        backgroundColor: whiteColor,
                         fontSize: screenWidth * 0.03,
                         fieldHeight: 0.05,
                         fieldWidth: 0.35,
                         keyboardType: TextInputType.datetime,
-                        prefixIcon: FaIcon(FontAwesomeIcons.clock),
+                        prefixIcon:
+                            FaIcon(color: orangeColor, FontAwesomeIcons.clock),
                         enabled: false,
                         controller: TextEditingController(
                           text:
@@ -187,11 +197,10 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                         onPressed: () {
                           _selectTime(context);
                         },
-                        backgroundColor: Colors.green,
+                        backgroundColor: orangeColor,
                         colorText: Colors.white,
                         buttonWidth: 0.28,
                         buttonHeight: 0.05,
-                        fontSize: screenWidth * 0.025,
                       ),
                     ],
                   ),
@@ -202,11 +211,10 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                       Navigator.pushNamedAndRemoveUntil(
                           context, '/activity', (route) => false);
                     },
-                    backgroundColor: Colors.green,
+                    backgroundColor: orangeColor,
                     colorText: Colors.white,
-                    buttonWidth: 0.35,
+                    buttonWidth: 0.4,
                     buttonHeight: 0.07,
-                    fontSize: screenWidth * 0.045,
                   )
                 ],
               ),
@@ -218,17 +226,27 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
   }
 
   void _selectDate(BuildContext context) async {
-    final newDate = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 7)),
-    );
+    try {
+      final currentDate = DateTime.now();
+      final newInitialDate = selectedDate.isBefore(currentDate) ||
+              selectedDate.isAfter(currentDate.add(const Duration(days: 7)))
+          ? currentDate
+          : selectedDate;
 
-    if (newDate != null) {
-      setState(() {
-        selectedDate = newDate;
-      });
+      final newDate = await showDatePicker(
+        context: context,
+        initialDate: newInitialDate,
+        firstDate: currentDate,
+        lastDate: currentDate.add(const Duration(days: 7)),
+      );
+
+      if (newDate != null) {
+        setState(() {
+          selectedDate = newDate;
+        });
+      }
+    } catch (error) {
+      print("Error selecting date: $error");
     }
   }
 

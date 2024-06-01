@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ButtonMenu extends StatelessWidget {
-  final IconData icon;
   final String text;
   final VoidCallback onPressed;
+  final String imageAsset;
 
-  const ButtonMenu({
-    Key? key,
-    required this.icon,
-    required this.text,
-    required this.onPressed,
-  }) : super(key: key);
+  const ButtonMenu(
+      {Key? key,
+      required this.text,
+      required this.onPressed,
+      required this.imageAsset})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     // Menggunakan MediaQuery untuk mendapatkan ukuran layar
-    final height = MediaQuery.of(context).size.height;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return ElevatedButton(
       onPressed: onPressed,
@@ -26,24 +27,28 @@ class ButtonMenu extends StatelessWidget {
         ),
       ),
       child: SizedBox(
-        width: height * 0.15, // Menggunakan tinggi layar sebagai referensi
-        height: height * 0.15,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: height * 0.09,
-              color: Colors.black,
-            ),
-            SizedBox(height: height * 0.01),
-            Text(
-              text,
-              style: const TextStyle(
-                color: Colors.black,
-              ),
-            ),
-          ],
+        width: screenHeight * 0.15,
+        height: screenHeight * 0.15,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final sizeHeight = constraints.maxHeight;
+            final sizeWidth = constraints.maxWidth;
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  imageAsset,
+                  height: sizeHeight * 0.5,
+                ),
+                SizedBox(height: sizeHeight * 0.1),
+                Text(
+                  text,
+                  style: GoogleFonts.poppins(
+                      color: Colors.black, fontSize: sizeWidth * 0.1),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

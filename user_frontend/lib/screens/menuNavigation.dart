@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:user_frontend/screens/activity/main.dart';
 import 'package:user_frontend/screens/home.dart';
 import 'package:user_frontend/screens/profile/main.dart';
+import 'package:user_frontend/utils/theme.dart';
 import 'package:user_frontend/widgets/appBarActivity.dart';
 import 'package:user_frontend/widgets/appBarHome.dart';
 import 'package:user_frontend/widgets/appBarProfile.dart';
@@ -50,10 +51,10 @@ class _MenuNavigationState extends State<MenuNavigation> {
 
     return Scaffold(
       bottomNavigationBar: ConvexAppBar(
-        backgroundColor: Colors.green,
+        backgroundColor: darkBlueColor,
         curveSize: sizeHeight * 0.2,
         style: TabStyle.react,
-        height: sizeHeight * 0.08,
+        height: sizeHeight * 0.07,
         items: const [
           TabItem(icon: Icons.home, title: 'Home'),
           TabItem(icon: Icons.event_note_outlined, title: 'Aktivitas'),
@@ -66,15 +67,17 @@ class _MenuNavigationState extends State<MenuNavigation> {
         },
       ),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(sizeHeight * 0.1),
+        preferredSize: Size.fromHeight(sizeHeight * 0.12),
         child: appWidget[currentIndex],
       ),
       body: bodyWidget[currentIndex],
       floatingActionButton: currentIndex == 0
           ? ButtonMembership(
-              backgroundColor: Colors.greenAccent,
-              textColor: Colors.white,
-              onPressed: () {},
+              backgroundColor: orangeColor,
+              textColor: royalBlue,
+              onPressed: () {
+                Navigator.pushNamed(context, '/membership');
+              },
             )
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

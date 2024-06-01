@@ -1,46 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:user_frontend/utils/customAppBar.dart';
 import 'package:user_frontend/utils/customBotton1.dart';
 import 'package:user_frontend/utils/customTextField1.dart';
+import 'package:user_frontend/utils/theme.dart';
 
 class EditProfilePage extends StatelessWidget {
   const EditProfilePage({Key? key});
 
   @override
   Widget build(BuildContext context) {
+    final sizeHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       resizeToAvoidBottomInset:
           false, // Menghindari perubahan tata letak saat keyboard muncul
-      appBar: AppBar(
-        leadingWidth: MediaQuery.of(context).size.width * 0.16,
-        leading: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: MediaQuery.of(context).size.width * 0.02,
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.black),
-            ), // Warna border bulatan
-            child: GestureDetector(
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                size: MediaQuery.of(context).size.height * 0.04,
-              ),
-              onTap: () {
-                Navigator.pop(context); // Kembali ke menu sebelumnya
-              },
-            ),
-          ),
-        ),
-        toolbarHeight: MediaQuery.of(context).size.height * 0.1,
-        title: Text(
-          'Edit Profil',
-          style: TextStyle(
-            fontSize: MediaQuery.of(context).size.height * 0.03,
-          ),
-        ),
-        centerTitle: true,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(sizeHeight * 0.1),
+        child: const CustomAppBar(title: 'Edit Profil'),
       ),
+
       body: LayoutBuilder(
         builder: (context, constraints) {
           final screenHeight = constraints.maxHeight;
@@ -65,7 +43,8 @@ class EditProfilePage extends StatelessWidget {
                       children: [
                         Text(
                           'Nama',
-                          style: TextStyle(fontSize: screenHeight * 0.024),
+                          style: GoogleFonts.poppins(
+                              fontSize: screenHeight * 0.024),
                         ),
                         SizedBox(width: screenWidth * 0.05),
                         SizedBox(
@@ -86,7 +65,8 @@ class EditProfilePage extends StatelessWidget {
                       children: [
                         Text(
                           'Username',
-                          style: TextStyle(fontSize: screenHeight * 0.024),
+                          style: GoogleFonts.poppins(
+                              fontSize: screenHeight * 0.024),
                         ),
                         SizedBox(width: screenWidth * 0.05),
                         SizedBox(
@@ -107,7 +87,8 @@ class EditProfilePage extends StatelessWidget {
                       children: [
                         Text(
                           'No telepon',
-                          style: TextStyle(fontSize: screenHeight * 0.024),
+                          style: GoogleFonts.poppins(
+                              fontSize: screenHeight * 0.024),
                         ),
                         SizedBox(width: screenWidth * 0.05),
                         SizedBox(
@@ -125,7 +106,7 @@ class EditProfilePage extends StatelessWidget {
                     ),
                     Text(
                       'Konfirmasi Password',
-                      style: TextStyle(fontSize: screenHeight * 0.04),
+                      style: GoogleFonts.poppins(fontSize: screenHeight * 0.04),
                     ),
                     SizedBox(
                       height: screenHeight * 0.02,
@@ -148,7 +129,7 @@ class EditProfilePage extends StatelessWidget {
                           Navigator.pushNamedAndRemoveUntil(
                               context, '/home', (route) => false);
                         },
-                        backgroundColor: Colors.green,
+                        backgroundColor: orangeColor,
                         colorText: Colors.white)
                   ],
                 ),

@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-class InfoHelp {
-  final String title;
-  final String detail;
-
-  InfoHelp({required this.title, required this.detail});
-}
+import 'package:google_fonts/google_fonts.dart';
+import 'package:user_frontend/utils/customAppBar.dart';
+import 'package:user_frontend/utils/theme.dart';
+import '../../models/help.dart';
 
 class HelpPage extends StatefulWidget {
   HelpPage({Key? key}) : super(key: key);
@@ -16,23 +13,23 @@ class HelpPage extends StatefulWidget {
 }
 
 class _HelpPageState extends State<HelpPage> {
-  List<InfoHelp> infoHelps = [
-    InfoHelp(
+  List<Help> infoHelps = [
+    Help(
       title: 'Ganti Password',
       detail:
           'loreeiwfbewebwufibewifubewfiewbfeiuwbfewiufbewibfewifubewifbewfi',
     ),
-    InfoHelp(
+    Help(
       title: 'Ganti Password',
       detail:
           'loreeiwfbewebwufibewifubewfiewbfeiuwbfewiufbewibfewifubewifbewfi',
     ),
-    InfoHelp(
+    Help(
       title: 'Ganti Password',
       detail:
           'loreeiwfbewebwufibewifubewfiewbfeiuwbfewiufbewibfewifubewifbewfi',
     ),
-    InfoHelp(
+    Help(
       title: 'Ganti Password',
       detail:
           'loreeiwfbewebwufibewifubewfiewbfeiuwbfewiufbewibfewifubewifbewfi',
@@ -51,37 +48,7 @@ class _HelpPageState extends State<HelpPage> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(sizeHeight * 0.1),
-        child: AppBar(
-          leadingWidth: sizeWidth * 0.16,
-          leading: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: sizeWidth * 0.02,
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.black),
-              ),
-              child: GestureDetector(
-                child: Icon(
-                  Icons.arrow_back_ios_new_rounded,
-                  size: sizeHeight * 0.04,
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-          ),
-          toolbarHeight: sizeHeight * 0.1,
-          title: Text(
-            'Bantuan',
-            style: TextStyle(
-              fontSize: sizeHeight * 0.03,
-            ),
-          ),
-          centerTitle: true,
-        ),
+        child: const CustomAppBar(title: 'Bantuan'),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,12 +63,12 @@ class _HelpPageState extends State<HelpPage> {
               children: [
                 Text(
                   'Pertanyaan Umum Yang',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                       fontSize: sizeWidth * 0.05, fontWeight: FontWeight.w600),
                 ),
                 Text(
                   'Sering Diajukan',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                       fontSize: sizeWidth * 0.05, fontWeight: FontWeight.w600),
                 ),
               ],
@@ -118,20 +85,26 @@ class _HelpPageState extends State<HelpPage> {
                     return Container(
                       margin: EdgeInsets.symmetric(vertical: sizeHeight * 0.01),
                       decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 107, 179, 109),
+                          color: darkBlueColor,
                           borderRadius:
                               BorderRadius.circular(sizeWidth * 0.03)),
                       child: ExpansionTile(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(sizeWidth * 0.03),
                         ),
-                        title: Text(infoHelp.title),
+                        title: Text(
+                          infoHelp.title,
+                          style: GoogleFonts.poppins(color: whiteColor),
+                        ),
                         children: [
                           Padding(
                             padding: EdgeInsets.symmetric(
                                 horizontal: sizeHeight * 0.02,
                                 vertical: sizeHeight * 0.02),
-                            child: Text(infoHelp.detail),
+                            child: Text(
+                              infoHelp.detail,
+                              style: GoogleFonts.poppins(color: whiteColor),
+                            ),
                           ),
                         ],
                       ),
@@ -145,7 +118,7 @@ class _HelpPageState extends State<HelpPage> {
             width: sizeWidth,
             padding: EdgeInsets.all(sizeWidth * 0.04),
             decoration: BoxDecoration(
-                color: Colors.green,
+                color: darkBlueColor,
                 borderRadius: BorderRadiusDirectional.vertical(
                     top: Radius.circular(sizeWidth * 0.04))),
             height: sizeHeight * 0.15,
@@ -154,7 +127,8 @@ class _HelpPageState extends State<HelpPage> {
               children: [
                 Text(
                   'Masih Butuh Bantuan ?',
-                  style: TextStyle(fontSize: sizeWidth * 0.05),
+                  style: GoogleFonts.poppins(
+                      color: orangeColor, fontSize: sizeWidth * 0.05),
                 ),
                 SizedBox(
                   height: sizeHeight * 0.01,
@@ -164,13 +138,15 @@ class _HelpPageState extends State<HelpPage> {
                     FaIcon(
                       FontAwesomeIcons.phoneVolume,
                       size: sizeWidth * 0.08,
+                      color: orangeColor,
                     ),
                     SizedBox(
                       width: sizeWidth * 0.05,
                     ),
                     Text(
                       '021 XXXXXXXXXX',
-                      style: TextStyle(fontSize: sizeWidth * 0.05),
+                      style: GoogleFonts.poppins(
+                          fontSize: sizeWidth * 0.05, color: orangeColor),
                     )
                   ],
                 )

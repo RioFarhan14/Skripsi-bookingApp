@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:user_frontend/providers/fieldProvider.dart';
+import 'package:user_frontend/providers/membershipProvider.dart';
+import 'package:user_frontend/utils/customAppBar.dart';
 import 'package:user_frontend/utils/customBotton1.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -11,38 +16,38 @@ class CheckoutPage extends StatefulWidget {
 
 class _CheckoutPageState extends State<CheckoutPage> {
   String? _selectedPaymentMethod;
+  late dynamic product;
+  late String quantity;
+  @override
+  void initState() {
+    super.initState();
+    final Map<String, dynamic>? args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    if (args != null) {
+      final int id = args['id'];
+      quantity = args['quantity'];
+      final bool isBooking = args['booking'];
+      if (isBooking == true) {
+        product = Provider.of<FieldProvider>(context, listen: false)
+            .fields
+            .firstWhere((fields) => fields.id == id);
+      } else {
+        product = Provider.of<MembershipProvider>(context, listen: false)
+            .memberships
+            .firstWhere((memberships) => memberships.id == id);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        leadingWidth: screenWidth * 0.16,
-        leading: Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.02),
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.black),
-            ),
-            child: GestureDetector(
-              child: Icon(
-                Icons.arrow_back_ios_new_rounded,
-                size: screenHeight * 0.04,
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-        ),
-        toolbarHeight: screenHeight * 0.1,
-        title: Text(
-          'Checkout',
-          style: TextStyle(fontSize: screenHeight * 0.03),
-        ),
-        centerTitle: true,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(screenHeight * 0.1),
+        child: const CustomAppBar(title: 'Checkout'),
       ),
       body: Container(
         margin: EdgeInsets.symmetric(
@@ -62,7 +67,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(screenWidth * 0.03),
                     child: Image.network(
-                      'https://lh3.googleusercontent.com/p/AF1QipOo4N0B2Y9zmSY8Wiun0DbN8SNDRJV15_Q5dcp5=s1360-w1360-h1020',
+                      product.image,
                       height: screenHeight * 0.15,
                       width: screenWidth * 0.35,
                       fit: BoxFit.fill,
@@ -75,8 +80,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Lapangan A',
-                          style: TextStyle(fontSize: screenWidth * 0.05),
+                          product.name,
+                          style:
+                              GoogleFonts.poppins(fontSize: screenWidth * 0.05),
                         ),
                         SizedBox(
                           height: screenHeight * 0.02,
@@ -85,12 +91,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           TextSpan(
                             children: [
                               TextSpan(
-                                text: '1 x ',
-                                style: TextStyle(fontSize: screenWidth * 0.04),
+                                text: quantity,
+                                style: GoogleFonts.poppins(
+                                    fontSize: screenWidth * 0.04),
                               ),
                               TextSpan(
-                                text: 'Rp.110.000,-',
-                                style: TextStyle(
+                                text: ' x ',
+                                style: GoogleFonts.poppins(
+                                    fontSize: screenWidth * 0.04),
+                              ),
+                              TextSpan(
+                                text: product.price,
+                                style: GoogleFonts.poppins(
                                     fontSize: screenWidth * 0.04,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -109,11 +121,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
               children: [
                 Text(
                   'Total Biaya',
-                  style: TextStyle(fontSize: screenWidth * 0.055),
+                  style: GoogleFonts.poppins(fontSize: screenWidth * 0.055),
                 ),
                 Text(
-                  'Rp.110.000,-',
-                  style: TextStyle(fontSize: screenWidth * 0.055),
+                  '${quantity} ${product.price}',
+                  style: GoogleFonts.poppins(fontSize: screenWidth * 0.055),
                 ),
               ],
             ),
@@ -124,7 +136,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 hintText: 'Metode Pembayaran',
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: screenWidth * 0.05,
-                  vertical: screenHeight * 0.01,
+                  vertical: screenHeight * 0.02,
                 ),
               ),
               value: _selectedPaymentMethod,
@@ -153,8 +165,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 return DropdownMenuItem<String>(
                   value: value,
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const FaIcon(FontAwesomeIcons.wallet),
+                      const FaIcon(
+                        FontAwesomeIcons.wallet,
+                      ),
                       SizedBox(
                           width:
                               screenWidth * 0.02), // Jarak antara icon dan teks

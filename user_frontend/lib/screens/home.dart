@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:user_frontend/widgets/buttonMenu.dart';
-import 'package:user_frontend/widgets/slideImage.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key});
@@ -16,8 +15,13 @@ class HomePage extends StatelessWidget {
           SizedBox(
             height: screenHeight * 0.02,
           ),
-          const SlideImage(
-              imageUrl: 'https://picsum.photos/seed/picsum/200/300'),
+          Container(
+              height: screenHeight * 0.2,
+              width: screenWidth * 0.9,
+              child: Image.asset(
+                'assets/images/homeImg.jpg',
+                fit: BoxFit.fill,
+              )),
           SizedBox(height: screenHeight * 0.02),
           Container(
             height: screenHeight * 0.40,
@@ -33,14 +37,14 @@ class HomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     ButtonMenu(
-                      icon: Icons.sports_soccer,
+                      imageAsset: 'assets/images/bookIcon.png',
                       text: 'Pesan Lapangan',
                       onPressed: () {
                         Navigator.pushNamed(context, '/booking');
                       },
                     ),
                     ButtonMenu(
-                      icon: Icons.calendar_month_outlined,
+                      imageAsset: 'assets/images/scheduleIcon.png',
                       text: 'Lihat Jadwal',
                       onPressed: () {
                         Navigator.pushNamed(context, '/viewSchedule');
@@ -52,14 +56,14 @@ class HomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     ButtonMenu(
-                      icon: Icons.help,
+                      imageAsset: 'assets/images/help.png',
                       text: 'Bantuan',
                       onPressed: () {
                         Navigator.pushNamed(context, '/help');
                       },
                     ),
                     ButtonMenu(
-                      icon: Icons.info,
+                      imageAsset: 'assets/images/about.png',
                       text: 'Tentang Kami',
                       onPressed: () {
                         Navigator.pushNamed(context, '/aboutMe');

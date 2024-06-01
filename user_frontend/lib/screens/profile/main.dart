@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:user_frontend/screens/profile/editProfile.dart';
 import 'package:user_frontend/utils/customBotton1.dart';
+import 'package:user_frontend/utils/theme.dart';
 import 'package:user_frontend/widgets/textProfile.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -14,10 +15,10 @@ class ProfilePage extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          Icon(
-            Icons.person_pin,
-            size: screenHeight * 0.23,
-            color: Colors.green,
+          Image.asset(
+            'assets/images/profile.png',
+            width: screenWidth * 0.4,
+            height: screenWidth * 0.4,
           ),
           SizedBox(height: screenHeight * 0.04),
           SizedBox(
@@ -48,8 +49,8 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
           CustomButton1(
-            buttonHeight: 0.07,
-            buttonWidth: 0.8,
+            buttonHeight: 0.06,
+            buttonWidth: 0.7,
             title: 'Edit Profil',
             onPressed: () {
               // Navigasi ke halaman Edit Profile
@@ -60,13 +61,13 @@ class ProfilePage extends StatelessWidget {
                 ),
               );
             },
-            backgroundColor: Colors.green,
+            backgroundColor: orangeColor,
             colorText: Colors.white,
           ),
           SizedBox(height: screenHeight * 0.01),
           CustomButton1(
-            buttonHeight: 0.07,
-            buttonWidth: 0.8,
+            buttonHeight: 0.06,
+            buttonWidth: 0.7,
             title: 'Logout',
             onPressed: () {},
             backgroundColor: Colors.red,

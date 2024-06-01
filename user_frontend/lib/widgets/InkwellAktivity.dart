@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:user_frontend/utils/theme.dart';
 
 class InkwellActivity extends StatelessWidget {
   final String title;
@@ -20,13 +22,13 @@ class InkwellActivity extends StatelessWidget {
     return Material(
       child: InkWell(
         onTap: onTap,
-        splashColor: Colors.green.shade300, // Warna splash saat tombol ditekan
+        splashColor: darkBlueColor, // Warna splash saat tombol ditekan
         highlightColor: Colors.transparent, // Menghilangkan highlight color
         child: Container(
           decoration: BoxDecoration(
-            color: isActive ? Colors.greenAccent : Colors.green.shade400,
+            color: isActive ? whiteColor : darkBlueColor,
             border: isActive
-                ? const Border(bottom: BorderSide(color: Colors.blue, width: 2))
+                ? Border(bottom: BorderSide(color: blackColor, width: 2))
                 : null,
           ),
           width: screenWidth * 0.5,
@@ -36,7 +38,7 @@ class InkwellActivity extends StatelessWidget {
             title,
             textAlign: TextAlign
                 .center, // Untuk memastikan teks terpusat secara horizontal
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               color: isActive
                   ? Colors.black
                   : Colors.white, // Mengubah warna teks saat aktif
