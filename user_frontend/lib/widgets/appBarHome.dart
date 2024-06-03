@@ -21,6 +21,7 @@ class AppBarHome extends StatelessWidget implements PreferredSizeWidget {
         final sizeWidth = constraints.maxWidth;
 
         return AppBar(
+          automaticallyImplyLeading: false,
           toolbarHeight: sizeHeight * 0.9,
           backgroundColor: darkBlueColor,
           title: Column(

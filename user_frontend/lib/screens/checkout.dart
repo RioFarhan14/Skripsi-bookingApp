@@ -18,15 +18,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String? _selectedPaymentMethod;
   late dynamic product;
   late String quantity;
+  late num total;
+
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     final Map<String, dynamic>? args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
 
     if (args != null) {
       final int id = args['id'];
-      quantity = args['quantity'];
+      quantity = args['quantity'].toString(); // Ensure quantity is a String
       final bool isBooking = args['booking'];
       if (isBooking == true) {
         product = Provider.of<FieldProvider>(context, listen: false)
@@ -37,6 +44,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             .memberships
             .firstWhere((memberships) => memberships.id == id);
       }
+      total = int.parse(quantity) * product.price; // Calculate total correctly
     }
   }
 
@@ -101,7 +109,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     fontSize: screenWidth * 0.04),
                               ),
                               TextSpan(
-                                text: product.price,
+                                text: product.price
+                                    .toString(), // Ensure price is a String
                                 style: GoogleFonts.poppins(
                                     fontSize: screenWidth * 0.04,
                                     fontWeight: FontWeight.bold),
@@ -124,7 +133,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   style: GoogleFonts.poppins(fontSize: screenWidth * 0.055),
                 ),
                 Text(
-                  '${quantity} ${product.price}',
+                  total.toString(), // Ensure total is converted to String
                   style: GoogleFonts.poppins(fontSize: screenWidth * 0.055),
                 ),
               ],
@@ -132,7 +141,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             SizedBox(height: screenHeight * 0.03),
             DropdownButtonFormField<String>(
               decoration: InputDecoration(
-                border: const OutlineInputBorder(), // Tambahkan border di sini
+                border: const OutlineInputBorder(), // Add border here
                 hintText: 'Metode Pembayaran',
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: screenWidth * 0.05,
@@ -171,8 +180,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         FontAwesomeIcons.wallet,
                       ),
                       SizedBox(
-                          width:
-                              screenWidth * 0.02), // Jarak antara icon dan teks
+                          width: screenWidth *
+                              0.02), // Space between icon and text
                       Text(value),
                     ],
                   ),

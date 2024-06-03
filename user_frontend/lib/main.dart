@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:user_frontend/providers/allBookingProvider.dart';
 import 'package:user_frontend/providers/bookingProvider.dart';
 import 'package:user_frontend/providers/fieldProvider.dart';
+import 'package:user_frontend/providers/helpProvider.dart';
 import 'package:user_frontend/providers/historyProvider.dart';
+import 'package:user_frontend/providers/informationProvider.dart';
 import 'package:user_frontend/providers/membershipProvider.dart';
 import 'package:user_frontend/screens/aboutMe/main.dart';
 import 'package:user_frontend/screens/activity/changeSchedule.dart';
@@ -12,8 +15,11 @@ import 'package:user_frontend/screens/booking/main.dart';
 import 'package:user_frontend/screens/checkout.dart';
 import 'package:user_frontend/screens/help/main.dart';
 import 'package:user_frontend/screens/information/main.dart';
+import 'package:user_frontend/screens/login.dart';
 import 'package:user_frontend/screens/menuNavigation.dart';
 import 'package:user_frontend/screens/membership/main.dart';
+import 'package:user_frontend/screens/register.dart';
+import 'package:user_frontend/screens/splash.dart';
 import 'package:user_frontend/screens/viewSchedule/main.dart';
 
 void main() {
@@ -31,11 +37,17 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => HistoryProvider()),
         ChangeNotifierProvider(create: (_) => FieldProvider()),
         ChangeNotifierProvider(create: (_) => MembershipProvider()),
+        ChangeNotifierProvider(create: (_) => HelpProvider()),
+        ChangeNotifierProvider(create: (_) => InformationProvider()),
+        ChangeNotifierProvider(create: (_) => AllBookingProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: '/menuNavigation',
+        initialRoute: '/splashScreen',
         routes: {
+          '/splashScreen': (context) => SplashScreen(),
+          '/login': (context) => LoginPage(),
+          '/register': (context) => RegisterPage(),
           '/menuNavigation': (context) => MenuNavigation(),
           '/home': (context) => MenuNavigation(initialIndex: 0),
           '/activity': (context) => MenuNavigation(initialIndex: 1),

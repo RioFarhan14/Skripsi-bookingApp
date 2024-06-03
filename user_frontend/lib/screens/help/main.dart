@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:user_frontend/providers/helpProvider.dart';
 import 'package:user_frontend/utils/customAppBar.dart';
 import 'package:user_frontend/utils/theme.dart';
-import '../../models/help.dart';
 
 class HelpPage extends StatefulWidget {
   HelpPage({Key? key}) : super(key: key);
@@ -13,29 +14,6 @@ class HelpPage extends StatefulWidget {
 }
 
 class _HelpPageState extends State<HelpPage> {
-  List<Help> infoHelps = [
-    Help(
-      title: 'Ganti Password',
-      detail:
-          'loreeiwfbewebwufibewifubewfiewbfeiuwbfewiufbewibfewifubewifbewfi',
-    ),
-    Help(
-      title: 'Ganti Password',
-      detail:
-          'loreeiwfbewebwufibewifubewfiewbfeiuwbfewiufbewibfewifubewifbewfi',
-    ),
-    Help(
-      title: 'Ganti Password',
-      detail:
-          'loreeiwfbewebwufibewifubewfiewbfeiuwbfewiufbewibfewifubewifbewfi',
-    ),
-    Help(
-      title: 'Ganti Password',
-      detail:
-          'loreeiwfbewebwufibewifubewfiewbfeiuwbfewiufbewibfewifubewifbewfi',
-    ),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -45,6 +23,8 @@ class _HelpPageState extends State<HelpPage> {
   Widget build(BuildContext context) {
     final sizeHeight = MediaQuery.of(context).size.height;
     final sizeWidth = MediaQuery.of(context).size.width;
+    final HelpData = Provider.of<HelpProvider>(context);
+    final infoHelps = HelpData.infoHelps;
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(sizeHeight * 0.1),

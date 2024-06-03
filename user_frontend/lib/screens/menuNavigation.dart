@@ -40,7 +40,7 @@ class _MenuNavigationState extends State<MenuNavigation> {
         title: 'Selamat Datang,',
         subtitle: 'Rio Farhan',
         onNotificationPressed: () {
-          Navigator.pushNamed(context, '/notification');
+          Navigator.pushNamed(context, '/information');
         },
       ),
       const AppBarActivity(title: 'Aktivitas'),

@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:user_frontend/providers/allBookingProvider.dart';
 import 'package:user_frontend/providers/fieldProvider.dart';
 import 'package:user_frontend/utils/customAppBar.dart';
 import 'package:user_frontend/utils/customBotton1.dart';
 import 'package:user_frontend/utils/customTextField1.dart';
 import 'package:user_frontend/utils/theme.dart';
-import 'package:user_frontend/utils/timeUtils.dart'; // Sesuaikan dengan nama file sebenarnya
+import 'package:user_frontend/utils/timeUtils.dart';
 
 class ViewSchedulePage extends StatefulWidget {
-  const ViewSchedulePage({super.key});
+  const ViewSchedulePage({Key? key});
 
   @override
   State<ViewSchedulePage> createState() => _ViewSchedulePageState();
@@ -18,26 +19,17 @@ class ViewSchedulePage extends StatefulWidget {
 
 class _ViewSchedulePageState extends State<ViewSchedulePage> {
   late TextEditingController textDate = TextEditingController();
-  final List<Map<String, String>> _data = [
-    {"Nama Pemesan": "Alice", "Waktu": "09:00"},
-    {"Nama Pemesan": "Bob", "Waktu": "10:00"},
-    {"Nama Pemesan": "Charlie", "Waktu": "11:00"},
-    {"Nama Pemesan": "David", "Waktu": "12:00"},
-    {"Nama Pemesan": "Eve", "Waktu": "13:00"},
-    {"Nama Pemesan": "Frank", "Waktu": "14:00"},
-    {"Nama Pemesan": "Grace", "Waktu": "15:00"},
-    {"Nama Pemesan": "Heidi", "Waktu": "16:00"},
-    {"Nama Pemesan": "Ivan", "Waktu": "17:00"},
-    {"Nama Pemesan": "Judy", "Waktu": "18:00"},
-  ];
   int? _selectedField;
 
   @override
   Widget build(BuildContext context) {
     final fieldData = Provider.of<FieldProvider>(context);
+    final allBookingProvider =
+        Provider.of<AllBookingProvider>(context); // Perbaikan nama variabel
     final fields = fieldData.fields;
     final sizeHeight = MediaQuery.of(context).size.height;
     final sizeWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(sizeHeight * 0.1),
@@ -129,7 +121,8 @@ class _ViewSchedulePageState extends State<ViewSchedulePage> {
                     title: 'Cari',
                     onPressed: () {
                       if (_selectedField != null && textDate.text.isNotEmpty) {
-                        _showTable(context);
+                        _showTable(context, allBookingProvider);
+                        // Perbaikan nama variabel
                       }
                     },
                     backgroundColor: darkBlueColor,
@@ -149,79 +142,99 @@ class _ViewSchedulePageState extends State<ViewSchedulePage> {
     );
   }
 
-  void _showTable(BuildContext context) {
-    // Check if data is available
-    if (_data.isEmpty) return;
+  void _showTable(BuildContext context, AllBookingProvider bookingProvider) {
+    final textDateValue = textDate.text;
+    final dateParts = textDateValue.split('-');
 
-    showModalBottomSheet(
-      context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-            top: Radius.circular(MediaQuery.of(context).size.width * 0.05)),
-      ),
-      builder: (BuildContext context) {
-        return Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height * 0.34,
-          padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
-          child: SingleChildScrollView(
-            child: DataTable(
-              columns: [
-                DataColumn(
-                  label: Text(
-                    'Nama Pemesan',
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
-                      fontSize: MediaQuery.of(context).size.width * 0.04,
-                    ),
-                  ),
-                ),
-                DataColumn(
-                  label: Text(
-                    'Waktu',
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.bold,
-                      fontSize: MediaQuery.of(context).size.width * 0.04,
-                    ),
-                  ),
-                ),
-              ],
-              rows: List<DataRow>.generate(_data.length, (index) {
-                return DataRow(
-                  color: MaterialStateProperty.resolveWith<Color?>(
-                      (Set<MaterialState> states) {
-                    if (index % 2 == 0) {
-                      return Colors.grey.withOpacity(0.3);
-                    }
-                    return null;
-                  }),
-                  cells: [
-                    DataCell(
-                      Padding(
-                        padding: EdgeInsets.all(
-                            MediaQuery.of(context).size.width * 0.01),
-                        child: Text(
-                          _data[index]['Nama Pemesan']!,
-                          style: GoogleFonts.poppins(fontSize: 14.0),
+    // Pastikan format tanggal sesuai dengan yang diharapkan (YYYY-MM-DD)
+    if (dateParts.length == 3 &&
+        dateParts[0].length == 4 &&
+        dateParts[1].length == 2 &&
+        dateParts[2].length == 2) {
+      // Parse tahun, bulan, dan hari dari string tanggal
+      final year = int.tryParse(dateParts[0]);
+      final month = int.tryParse(dateParts[1]);
+      final day = int.tryParse(dateParts[2]);
+
+      // Periksa apakah parsing berhasil
+      if (year != null && month != null && day != null) {
+        // Buat string tanggal dengan format "YYYY-MM-DD"
+        final selectedDate =
+            '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
+        final bookings = bookingProvider.getBookingsByFieldAndDate(
+            _selectedField!, selectedDate);
+
+        showModalBottomSheet(
+          context: context,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+                top: Radius.circular(MediaQuery.of(context).size.width * 0.05)),
+          ),
+          builder: (BuildContext context) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.34,
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+              child: SingleChildScrollView(
+                child: DataTable(
+                  columns: [
+                    DataColumn(
+                      label: Text(
+                        'Nama Pemesan',
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: MediaQuery.of(context).size.width * 0.04,
                         ),
                       ),
                     ),
-                    DataCell(
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(
-                          _data[index]['Waktu']!,
-                          style: GoogleFonts.poppins(fontSize: 14.0),
+                    DataColumn(
+                      label: Text(
+                        'Waktu',
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: MediaQuery.of(context).size.width * 0.04,
                         ),
                       ),
                     ),
                   ],
-                );
-              }),
-            ),
-          ),
+                  rows: bookings.map((booking) {
+                    return DataRow(
+                      color: MaterialStateProperty.resolveWith<Color?>(
+                          (Set<MaterialState> states) {
+                        if (bookings.indexOf(booking) % 2 == 0) {
+                          return Colors.grey.withOpacity(0.3);
+                        }
+                        return null;
+                      }),
+                      cells: [
+                        DataCell(
+                          Padding(
+                            padding: EdgeInsets.all(
+                                MediaQuery.of(context).size.width * 0.01),
+                            child: Text(
+                              booking.namaPemesan,
+                              style: GoogleFonts.poppins(fontSize: 14.0),
+                            ),
+                          ),
+                        ),
+                        DataCell(
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              booking.waktu,
+                              style: GoogleFonts.poppins(fontSize: 14.0),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(), // Tambahkan .toList() pada hasil map
+                ),
+              ),
+            );
+          },
         );
-      },
-    );
+      }
+    }
   }
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:user_frontend/utils/theme.dart';
+import 'package:user_frontend/providers/membershipProvider.dart';
+import 'package:user_frontend/models/membership.dart';
 
 class MembershipPage extends StatefulWidget {
   const MembershipPage({super.key});
@@ -10,12 +13,16 @@ class MembershipPage extends StatefulWidget {
 }
 
 class _MembershipPageState extends State<MembershipPage> {
-  String _membershipType = '1'; // State variable untuk radio button
+  String _membershipType = '1'; // State variable for radio button
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final memberships = Provider.of<MembershipProvider>(context).memberships;
+    Membership selectedMembership = memberships.firstWhere(
+        (membership) => membership.id.toString() == _membershipType);
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -87,6 +94,7 @@ class _MembershipPageState extends State<MembershipPage> {
                   SizedBox(
                     height: screenHeight * 0.03,
                   ),
+                  // Repeat this block for other benefits
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -112,6 +120,9 @@ class _MembershipPageState extends State<MembershipPage> {
                       'Potongan harga 20 % untuk Setiap pemesanan',
                       style: GoogleFonts.poppins(fontSize: screenWidth * 0.035),
                     ),
+                  ),
+                  SizedBox(
+                    height: screenHeight * 0.02,
                   ),
                   SizedBox(
                     height: screenHeight * 0.02,
@@ -174,108 +185,78 @@ class _MembershipPageState extends State<MembershipPage> {
                   SizedBox(
                     height: screenHeight * 0.02,
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(screenWidth * 0.02),
-                        border: Border.all(width: 1)),
-                    child: ListTile(
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '1 Bulan',
-                            style: GoogleFonts.poppins(
-                                fontSize: screenWidth * 0.05),
-                          ),
-                          Text(
-                            'Rp.100.000,-',
-                            style: GoogleFonts.poppins(
-                                fontSize: screenWidth * 0.05),
-                          ),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Radio<String>(
-                            value: '1',
-                            groupValue: _membershipType,
-                            onChanged: (value) {
-                              setState(() {
-                                _membershipType = value!;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      onTap: () {
-                        setState(() {
-                          _membershipType = '1';
-                        });
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: screenHeight * 0.015,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(screenWidth * 0.02),
-                        border: Border.all(width: 1)),
-                    child: ListTile(
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '3 Bulan',
-                            style: GoogleFonts.poppins(
-                                fontSize: screenWidth * 0.05),
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'Rp.300.000,-',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: screenWidth * 0.04,
-                                    decoration: TextDecoration.lineThrough,
-                                    color: Colors.red, // Warna teks coret
+                  // Membership options
+                  ...memberships.map((membership) => Container(
+                        margin: EdgeInsets.only(bottom: screenHeight * 0.015),
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              BorderRadius.circular(screenWidth * 0.02),
+                          border: Border.all(width: 1),
+                        ),
+                        child: ListTile(
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                membership.name,
+                                style: GoogleFonts.poppins(
+                                    fontSize: screenWidth * 0.05),
+                              ),
+                              if (membership.id ==
+                                  2) // Assuming this is the 3-month membership with a discount
+                                Text.rich(
+                                  TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: 'Rp.300.000,-',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: screenWidth * 0.04,
+                                          decoration:
+                                              TextDecoration.lineThrough,
+                                          color:
+                                              Colors.red, // Strikethrough color
+                                        ),
+                                      ),
+                                      const TextSpan(
+                                        text: ' ',
+                                      ),
+                                      TextSpan(
+                                        text: 'Rp.200.000,-',
+                                        style: GoogleFonts.poppins(
+                                            fontSize: screenWidth * 0.05),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                                const TextSpan(
-                                  text: ' ',
-                                ),
-                                TextSpan(
-                                  text: 'Rp.200.000,-',
+                                )
+                              else
+                                Text(
+                                  'Rp.${membership.price},-',
                                   style: GoogleFonts.poppins(
                                       fontSize: screenWidth * 0.05),
                                 ),
-                              ],
-                            ),
+                            ],
                           ),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Radio<String>(
-                            value: '3',
-                            groupValue: _membershipType,
-                            onChanged: (value) {
-                              setState(() {
-                                _membershipType = value!;
-                              });
-                            },
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Radio<String>(
+                                value: membership.id.toString(),
+                                groupValue: _membershipType,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _membershipType = value!;
+                                  });
+                                },
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      onTap: () {
-                        setState(() {
-                          _membershipType = '3';
-                        });
-                      },
-                    ),
-                  ),
+                          onTap: () {
+                            setState(() {
+                              _membershipType = membership.id.toString();
+                            });
+                          },
+                        ),
+                      )),
                 ],
               ),
             ),
@@ -288,9 +269,9 @@ class _MembershipPageState extends State<MembershipPage> {
             context,
             '/checkout',
             arguments: {
-              'name': 'name',
+              'id': selectedMembership.id,
               'quantity': 1,
-              'price': 100000,
+              'booking': false,
             },
           );
         },

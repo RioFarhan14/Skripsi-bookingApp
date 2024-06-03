@@ -1,33 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:user_frontend/providers/informationProvider.dart';
 import 'package:user_frontend/utils/customAppBar.dart';
 import 'package:user_frontend/utils/theme.dart';
-import '../../models/Information.dart';
 
 class InformationPage extends StatelessWidget {
   InformationPage({super.key});
-  final List<Information> Informations = [
-    Information(
-        title: 'Booking',
-        text: 'Pesanan anda 15 menit lagi akan di mulai',
-        time: DateTime(2024, 23, 05, 15, 27)),
-    Information(
-        title: 'Booking',
-        text: 'Pesanan anda 15 menit lagi akan di mulai',
-        time: DateTime(2024, 23, 05, 15, 27)),
-    Information(
-        title: 'Booking',
-        text: 'Pesanan anda 15 menit lagi akan di mulai',
-        time: DateTime(2024, 23, 05, 15, 27)),
-    Information(
-        title: 'Booking',
-        text: 'Pesanan anda 15 menit lagi akan di mulai',
-        time: DateTime(2024, 23, 05, 15, 27)),
-  ];
+
   @override
   Widget build(BuildContext context) {
     final sizeHeight = MediaQuery.of(context).size.height;
     final sizeWidth = MediaQuery.of(context).size.width;
+    final infoData = Provider.of<InformationProvider>(context);
+    final informations = infoData.informations;
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(sizeHeight * 0.1),
@@ -38,9 +24,9 @@ class InformationPage extends StatelessWidget {
           margin: EdgeInsets.only(top: sizeHeight * 0.02),
           width: sizeWidth * 0.8,
           child: ListView.builder(
-            itemCount: Informations.length,
+            itemCount: informations.length,
             itemBuilder: (context, index) {
-              final Information = Informations[index];
+              final Information = informations[index];
               return Container(
                 margin: EdgeInsets.symmetric(vertical: sizeHeight * 0.01),
                 width: sizeWidth * 0.5,
