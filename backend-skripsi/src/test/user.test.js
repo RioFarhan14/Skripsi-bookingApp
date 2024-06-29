@@ -222,4 +222,14 @@ describe("PATCH /api/users/current", function () {
     expect(result.status).toBe(400);
     expect(result.body.errors).toBeDefined();
   });
+
+  it("should reject if request not valid", async () => {
+    const result = await supertest(web)
+      .patch("/api/users/current")
+      .set("Authorization", "test123")
+      .send({});
+
+    expect(result.status).toBe(401);
+    expect(result.body.errors).toBeDefined();
+  });
 });
