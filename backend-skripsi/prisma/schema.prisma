@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id String @id @db.VarChar(11)
+  username String @db.VarChar(15) @unique
+  password String @db.VarChar(64)
+  name String @db.VarChar(60)
+  user_phone String @db.VarChar(13) @unique
+  role Role
+  token String? @db.VarChar(100)
+  memberships Membership[]
+  notifications Notification[]
+  bookings Booking[]
+  transactions Transaction[]
+  @@map("users")
+}
+
+model Product {
+  product_id Int @id @default(autoincrement())
+  product_name String @db.VarChar(20)
+  product_type product_type
+  price Int @db.Int
+  image_url String @db.VarChar(100)
+  description String? @db.VarChar(100)
+  bookings Booking[]
+  transaction_details Transaction_detail[]
+  @@map("products")
+}
+
+model Membership {
+  membership_id Int @id
+  user_id String @db.VarChar(11)
+  start_date DateTime
+  end_date DateTime
+  user User @relation(fields: [user_id], references: [user_id])
+  @@map("memberships")
+}
+
+model Notification {
+  notification_id Int @id
+  user_id String @db.VarChar(11)
+  message String @db.VarChar(225)
+  notification_date DateTime
+  status status_notification
+  user User @relation(fields: [user_id], references: [user_id])
+  @@map("notifications")
+}
+
+model Booking {
+  booking_id Int @id
+  user_id String @db.VarChar(11)
+  product_id Int
+  status status_booking
+  booking_date DateTime
+  start_time DateTime
+  end_time DateTime
+  user User @relation(fields: [user_id], references: [user_id])
+  product Product @relation(fields: [product_id], references: [product_id])
+  @@map("bookings")
+}
+
+model Transaction {
+  transaction_id Int @id
+  user_id String
+  transaction_date DateTime
+  metode_pembayaran MetodePembayaran // Menggunakan tipe data yang lebih spesifik untuk metode pembayaran
+  status status_transaction
+  discount Int?
+  total_amount Int
+  transaction_details Transaction_detail[]
+  user User @relation(fields: [user_id], references: [user_id])  // Menambahkan constraint di user_id
+  @@map("transactions")
+}
+
+model Transaction_detail {
+  transaction_detail_id Int @id
+  transaction_id Int
+  product_id Int
+  quantity Int
+  unit_price Int
+  transaction Transaction @relation(fields: [transaction_id], references: [transaction_id])
+  product Product @relation(fields: [product_id], references: [product_id]) 
+  @@map("transaction_details")
+}
+
+enum status_transaction {
+  success
+  pending
+  failed
+}
+
+enum status_notification {
+  read
+  unread
+}
+
+enum status_booking {
+  booked
+  pending
+}
+
+enum product_type {
+  membership
+  field
+}
+
+enum Role {
+  admin
+  user
+}
+
+enum MetodePembayaran {
+  gopay
+  mandiri
+  bca
+  shopeePay
+}
