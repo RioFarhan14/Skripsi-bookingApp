@@ -7,7 +7,7 @@ export const authMiddleware = async (req, res, next) => {
     res
       .status(401)
       .json({
-        errors: "Unathorized",
+        errors: "Silahkan login terlebih dahulu",
       })
       .end();
   } else {
@@ -20,7 +20,7 @@ export const authMiddleware = async (req, res, next) => {
       res
         .status(401)
         .json({
-          errors: "Unathorized",
+          errors: "token invalid",
         })
         .end();
     } else {

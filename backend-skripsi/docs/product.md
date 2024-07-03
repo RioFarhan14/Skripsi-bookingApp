@@ -123,9 +123,8 @@ Response Body Error :
 Headers :
 
 - Authorization : token
-- Role : admin
 
-Endpoint : POST /api/users/products
+Endpoint : PATCH /api/users/products
 
 Request Body :
 
@@ -167,7 +166,6 @@ Response Body Error :
 Headers :
 
 - Authorization : token
-- Role : admin
 
 Endpoint : PATH /api/users/products
 
@@ -211,7 +209,6 @@ Response Body Error :
 Headers :
 
 - Authorization : token
-- Role : admin
 
 Endpoint : DELETE /api/users/products
 

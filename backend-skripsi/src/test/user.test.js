@@ -1,4 +1,3 @@
-import { prismaClient } from "../application/database.js";
 import { logger } from "../application/logging.js";
 import { web } from "../application/web.js";
 import supertest from "supertest";
@@ -231,5 +230,30 @@ describe("PATCH /api/users/current", function () {
 
     expect(result.status).toBe(401);
     expect(result.body.errors).toBeDefined();
+  });
+});
+
+describe("DELETE /api/users/logout", function () {
+  beforeEach(async () => {
+    await createTestUser();
+  });
+  afterEach(async () => {
+    await removeTestUser();
+  });
+  it("should can logout", async () => {
+    const result = await supertest(web)
+      .delete("/api/users/logout")
+      .set("Authorization", "test");
+
+    expect(result.status).toBe(200);
+    expect(result.body.data).toBe("OK");
+  });
+
+  it("should reject if token is invalid", async () => {
+    const result = await supertest(web)
+      .delete("/api/users/logout")
+      .set("Authorization", "salah");
+
+    expect(result.status).toBe(401);
   });
 });

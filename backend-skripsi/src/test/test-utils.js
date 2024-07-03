@@ -1,7 +1,15 @@
 import { prismaClient } from "../application/database.js";
 import bcrypt from "bcrypt";
 export const removeTestUser = async () => {
-  await prismaClient.user.deleteMany({
+  const result = await prismaClient.user.count({
+    where: {
+      username: "test",
+    },
+  });
+  if (result !== 1) {
+    return;
+  }
+  return await prismaClient.user.delete({
     where: {
       username: "test",
     },
@@ -9,9 +17,48 @@ export const removeTestUser = async () => {
 };
 
 export const removeTestUser2 = async () => {
-  await prismaClient.user.deleteMany({
+  return await prismaClient.user.delete({
     where: {
       username: "Riofarhan",
+    },
+  });
+};
+
+export const removeTestAdmin = async () => {
+  await prismaClient.user.delete({
+    where: {
+      username: "admin",
+    },
+  });
+};
+export const removeTestProduct = async () => {
+  const result = await prismaClient.product.count({
+    where: {
+      product_id: 1,
+    },
+  });
+  if (!result) {
+    return;
+  }
+  return await prismaClient.product.delete({
+    where: {
+      product_id: 1,
+    },
+  });
+};
+
+export const removeTestProductField = async () => {
+  await prismaClient.product.deleteMany({
+    where: {
+      product_type: "field",
+    },
+  });
+};
+
+export const removeTestProductMembership = async () => {
+  await prismaClient.product.deleteMany({
+    where: {
+      product_type: "membership",
     },
   });
 };
@@ -62,6 +109,97 @@ export const createTestUser2 = async () => {
       user_phone: "12345678911",
       token: "test2",
       role: "user",
+    },
+  });
+};
+
+export const createTestAdmin = async () => {
+  await prismaClient.user.create({
+    data: {
+      user_id: await generateUserId(),
+      username: "admin",
+      password: await bcrypt.hash("1234567890", 10),
+      name: "admin",
+      user_phone: "12345678111",
+      token: "admin",
+      role: "admin",
+    },
+  });
+};
+
+export const createTestProduct = async () => {
+  await prismaClient.product.create({
+    data: {
+      product_id: 1,
+      product_name: "Lapangan A",
+      product_type: "field",
+      price: 100000,
+      description: "ini adalah lapangan futsal yang berada di paling depan",
+      image_url: "wwww.indo.com",
+    },
+  });
+};
+
+export const createProductField = async () => {
+  await prismaClient.product.create({
+    data: {
+      product_name: "Lapangan A",
+      product_type: "field",
+      price: 100000,
+      description: "ini adalah lapangan futsal yang berada di paling depan",
+      image_url: "wwww.indo.com",
+    },
+  });
+
+  await prismaClient.product.create({
+    data: {
+      product_name: "Lapangan B",
+      product_type: "field",
+      price: 100000,
+      description: "ini adalah lapangan futsal yang berada di paling depan",
+      image_url: "wwww.indo.com",
+    },
+  });
+
+  await prismaClient.product.create({
+    data: {
+      product_name: "Lapangan C",
+      product_type: "field",
+      price: 100000,
+      description: "ini adalah lapangan futsal yang berada di paling depan",
+      image_url: "wwww.indo.com",
+    },
+  });
+};
+
+export const createProductMembership = async () => {
+  await prismaClient.product.create({
+    data: {
+      product_name: "Membership 1 Bulan",
+      product_type: "membership",
+      price: 100000,
+      description: "membership",
+      image_url: "www.membership.com",
+    },
+  });
+
+  await prismaClient.product.create({
+    data: {
+      product_name: "Membership 2 Bulan",
+      product_type: "membership",
+      price: 100000,
+      description: "membership",
+      image_url: "www.membership.com",
+    },
+  });
+
+  await prismaClient.product.create({
+    data: {
+      product_name: "Membership 3 Bulan",
+      product_type: "membership",
+      price: 100000,
+      description: "membership",
+      image_url: "www.membership.com",
     },
   });
 };
