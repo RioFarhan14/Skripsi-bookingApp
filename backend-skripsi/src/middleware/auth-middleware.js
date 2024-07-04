@@ -1,5 +1,4 @@
-import { error } from "winston";
-import { prismaClient } from "../application/database";
+import { prismaClient } from "../application/database.js";
 
 export const authMiddleware = async (req, res, next) => {
   const token = req.get("Authorization");

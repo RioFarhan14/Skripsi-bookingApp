@@ -90,6 +90,7 @@ Response Body Error :
 }
 ```
 
+<!--
 ## Create Booking API
 
 Headers :
@@ -108,7 +109,7 @@ Request Body :
   "start-time": "18:00",
   "duration": "1"
 }
-```
+``` -->
 
 ## Update Booking API
 
