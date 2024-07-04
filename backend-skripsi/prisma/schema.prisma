@@ -35,7 +35,7 @@ model Product {
 }
 
 model Membership {
-  membership_id Int @id
+  membership_id String @id @db.VarChar(12)
   user_id String @db.VarChar(11)
   start_date DateTime
   end_date DateTime
@@ -44,21 +44,21 @@ model Membership {
 }
 
 model Notification {
-  notification_id Int @id
+  notification_id String @id @db.VarChar(8)
   user_id String @db.VarChar(11)
   message String @db.VarChar(225)
-  notification_date DateTime
+  notification_date DateTime @default(now())
   status status_notification
   user User @relation(fields: [user_id], references: [user_id])
   @@map("notifications")
 }
 
 model Booking {
-  booking_id Int @id
+  booking_id String @id @db.VarChar(12)
   user_id String @db.VarChar(11)
   product_id Int
   status status_booking
-  booking_date DateTime
+  booking_date DateTime @default(now())
   start_time DateTime
   end_time DateTime
   user User @relation(fields: [user_id], references: [user_id])
@@ -67,7 +67,7 @@ model Booking {
 }
 
 model Transaction {
-  transaction_id Int @id
+  transaction_id String @id @db.VarChar(12)
   user_id String
   transaction_date DateTime
   metode_pembayaran MetodePembayaran // Menggunakan tipe data yang lebih spesifik untuk metode pembayaran
@@ -80,8 +80,8 @@ model Transaction {
 }
 
 model Transaction_detail {
-  transaction_detail_id Int @id
-  transaction_id Int
+  transaction_detail_id String @id @db.VarChar(7)
+  transaction_id String
   product_id Int
   quantity Int
   unit_price Int
@@ -90,8 +90,14 @@ model Transaction_detail {
   @@map("transaction_details")
 }
 
+model Help {
+  help_id Int @id @default(autoincrement())
+  title String @db.VarChar(60)
+  message String @db.VarChar(225)
+}
+
 enum status_transaction {
-  success
+  paid
   pending
   failed
 }
@@ -104,6 +110,8 @@ enum status_notification {
 enum status_booking {
   booked
   pending
+  cancelled
+  completed
 }
 
 enum product_type {

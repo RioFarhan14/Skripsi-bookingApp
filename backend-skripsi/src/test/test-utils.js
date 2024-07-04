@@ -203,3 +203,29 @@ export const createProductMembership = async () => {
     },
   });
 };
+
+export const createTestHelp = async () => {
+  await prismaClient.help.create({
+    data: {
+      help_id: 1,
+      title: "Booking",
+      message: "Booking bisa dilakukan dengan metode pembayaran gopay",
+    },
+  });
+};
+
+export const removeHelpTest = async () => {
+  const result = await prismaClient.help.count({
+    where: {
+      title: "Booking",
+    },
+  });
+  if (!result) {
+    return;
+  }
+  return prismaClient.help.deleteMany({
+    where: {
+      title: "Booking",
+    },
+  });
+};

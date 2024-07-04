@@ -13,8 +13,6 @@ import {
   removeTestUser,
 } from "./test-utils.js";
 import { logger } from "../application/logging.js";
-import { func } from "joi";
-
 describe("POST /api/users/products", function () {
   beforeEach(async () => {
     await createTestUser();
@@ -23,6 +21,7 @@ describe("POST /api/users/products", function () {
   afterEach(async () => {
     await removeTestUser();
     await removeTestAdmin();
+    await removeTestProduct();
   });
 
   it("Should can create products", async () => {

@@ -10,6 +10,19 @@ import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
 import { getUserValidation } from "../validation/user-validation.js";
 
+const generateProductId = async () => {
+  const getId = await prismaClient.product.findFirst({
+    orderBy: {
+      product_id: "desc",
+    },
+  });
+  const newIdNumber = 1;
+  if (getId) {
+    newIdNumber = getId.product_id + 1;
+  }
+  return newIdNumber;
+};
+
 const create = async (request) => {
   const user = validate(createProductValidation, request);
 
@@ -31,6 +44,8 @@ const create = async (request) => {
   }
 
   const data = {};
+
+  data.product_id = await generateProductId();
   if (user.product_name) {
     data.product_name = user.product_name;
   }

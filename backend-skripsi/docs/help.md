@@ -1,5 +1,35 @@
 # Help Information API
 
+## Create Help Information API
+
+Headers :
+
+- Authorization : token
+- Role : admin
+
+Endpoint : Create /api/users/help
+
+Request Body :
+
+```json
+{
+  "title": "Perlindungan data",
+  "message": ".........."
+}
+```
+
+Response Body Success :
+
+```json
+{
+  "data": {
+    "help_id": "01",
+    "title": "Perlindungan data",
+    "message": "............."
+  }
+}
+```
+
 ## Get Help Information API
 
 Headers :
