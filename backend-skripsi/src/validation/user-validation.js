@@ -1,12 +1,10 @@
-import { Role } from "@prisma/client";
 import Joi from "joi";
 
 const createUserValidation = Joi.object({
   user_id: Joi.string().min(11).max(11).required(),
   username: Joi.string().min(3).max(15).required(),
   password: Joi.string().min(3).max(64).required(),
-  confirm_password: Joi.ref("password"),
-  Role: Joi.string().min(4).max(5).required(),
+  role: Joi.string().valid("admin", "user").required(),
   name: Joi.string().max(60).required(),
   user_phone: Joi.string()
     .min(11)
@@ -45,10 +43,30 @@ const updateUserValidation = Joi.object({
     .pattern(/^[0-9]+$/)
     .optional(),
 });
+
+const updateUsersValidation = Joi.object({
+  user_id_token: Joi.string().min(11).max(11).required(),
+  user_id: Joi.string().min(11).max(11).required(),
+  username: Joi.string().min(3).max(15).optional(),
+  password: Joi.string().min(3).max(64).optional(),
+  name: Joi.string().max(60).optional(),
+  user_phone: Joi.string()
+    .min(11)
+    .max(13)
+    .pattern(/^[0-9]+$/)
+    .optional(),
+});
+
+const deleteUsersValidation = Joi.object({
+  user_id_token: Joi.string().min(11).max(11).required(),
+  user_id: Joi.string().min(11).max(11).required(),
+});
 export {
   registerUserValidation,
   loginUserValidation,
   getUserValidation,
   updateUserValidation,
   createUserValidation,
+  updateUsersValidation,
+  deleteUsersValidation,
 };

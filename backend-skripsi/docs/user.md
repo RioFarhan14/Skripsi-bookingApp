@@ -2,7 +2,7 @@
 
 ## Create User API
 
-Endpoint : POST /api/users
+Endpoint : POST /api/users/create
 
 Headers :
 
@@ -47,7 +47,7 @@ Response Body Error :
 
 ## Update User API
 
-Endpoint : PATH /api/users
+Endpoint : PATH /api/users/update
 
 Headers :
 
@@ -92,7 +92,7 @@ Response Body Error :
 
 ## Delete User API
 
-Endpoint : DELETE /api/users
+Endpoint : DELETE /api/users/delete
 
 Headers :
 

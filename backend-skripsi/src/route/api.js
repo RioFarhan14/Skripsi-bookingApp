@@ -6,9 +6,16 @@ import helpController from "../controller/help-controller.js";
 
 const userRouter = new express.Router();
 userRouter.use(authMiddleware);
+// user
 userRouter.get("/api/users/current", userController.get);
 userRouter.patch("/api/users/current", userController.update);
 userRouter.delete("/api/users/logout", userController.logout);
+
+//admin
+userRouter.get("/api/users", userController.getUsers);
+userRouter.post("/api/users/create", userController.create);
+userRouter.patch("/api/users/update", userController.updateUsers);
+userRouter.delete("/api/users/delete", userController.deleteUsers);
 
 //productService
 userRouter.get("/api/users/products", productController.get);

@@ -1,4 +1,19 @@
+import { request } from "express";
 import userService from "../service/user-service.js";
+
+const create = async (req, res, next) => {
+  try {
+    const user_id = req.user.user_id;
+    const request = req.body;
+    request.user_id = user_id;
+    const result = await userService.create(request);
+    res.status(200).json({
+      data: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
 
 const register = async (req, res, next) => {
   try {
@@ -33,12 +48,38 @@ const get = async (req, res, next) => {
   }
 };
 
+const getUsers = async (req, res, next) => {
+  try {
+    const user_id = req.user.user_id;
+    const result = await userService.getUsers(user_id);
+    res.status(200).json({
+      data: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 const update = async (req, res, next) => {
   try {
     const user_id = req.user.user_id;
     const request = req.body;
     request.user_id = user_id;
     const result = await userService.update(request);
+    res.status(200).json({
+      data: result,
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
+const updateUsers = async (req, res, next) => {
+  try {
+    const user_id_token = req.user.user_id;
+    const request = req.body;
+    request.user_id_token = user_id_token;
+    const result = await userService.updateUsers(request);
     res.status(200).json({
       data: result,
     });
@@ -58,10 +99,28 @@ const logout = async (req, res, next) => {
   }
 };
 
+const deleteUsers = async (req, res, next) => {
+  try {
+    const user_id_token = req.user.user_id;
+    const request = req.body;
+    request.user_id_token = user_id_token;
+    await userService.deleteUsers(request);
+    res.status(200).json({
+      data: "Behasil Dihapus",
+    });
+  } catch (e) {
+    next(e);
+  }
+};
+
 export default {
   register,
   login,
   get,
+  getUsers,
   update,
   logout,
+  create,
+  updateUsers,
+  deleteUsers,
 };

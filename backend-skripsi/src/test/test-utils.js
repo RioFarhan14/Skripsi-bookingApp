@@ -17,6 +17,14 @@ export const removeTestUser = async () => {
 };
 
 export const removeTestUser2 = async () => {
+  const result = await prismaClient.user.count({
+    where: {
+      username: "Riofarhan",
+    },
+  });
+  if (result !== 1) {
+    return;
+  }
   return await prismaClient.user.delete({
     where: {
       username: "Riofarhan",

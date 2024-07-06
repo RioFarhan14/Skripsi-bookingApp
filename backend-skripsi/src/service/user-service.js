@@ -1,9 +1,11 @@
 import { validate } from "../validation/validation.js";
 import {
   createUserValidation,
+  deleteUsersValidation,
   getUserValidation,
   loginUserValidation,
   registerUserValidation,
+  updateUsersValidation,
   updateUserValidation,
 } from "../validation/user-validation.js";
 import { prismaClient } from "../application/database.js";
@@ -12,7 +14,7 @@ import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 import { request } from "express";
 
-const generateUserId = async () => {
+const generateUserId = async (role) => {
   const lastUser = await prismaClient.user.findFirst({
     orderBy: {
       user_id: "desc",
@@ -32,7 +34,13 @@ const generateUserId = async () => {
     .toString()
     .padStart(2, "0")}${date.getFullYear().toString().slice(-2)}`;
 
-  const userId = `${newIdNumber.toString().padStart(3, "0")}02${formattedDate}`;
+  if (role === "user") {
+    const userId = `${newIdNumber
+      .toString()
+      .padStart(3, "0")}02${formattedDate}`;
+    return userId;
+  }
+  const userId = `${newIdNumber.toString().padStart(3, "0")}01${formattedDate}`;
   return userId;
 };
 
@@ -61,8 +69,8 @@ const register = async (request) => {
   }
 
   user.password = await bcrypt.hash(user.password, 10);
-  user.user_id = await generateUserId();
   const role = "user";
+  user.user_id = await generateUserId(role);
 
   return prismaClient.user.create({
     data: {
@@ -122,9 +130,8 @@ const create = async (request) => {
   if (existingPhone) {
     throw new ResponseError(400, "Nomor telepon sudah digunakan");
   }
-
   user.password = await bcrypt.hash(user.password, 10);
-  user.user_id = await generateUserId();
+  user.user_id = await generateUserId(user.role);
 
   return prismaClient.user.create({
     data: {
@@ -139,6 +146,7 @@ const create = async (request) => {
       username: true,
       name: true,
       user_phone: true,
+      role: true,
     },
   });
 };
@@ -195,9 +203,32 @@ const get = async (user_id) => {
   });
 
   if (!user) {
-    throw new ResponseError(404, "user is not found");
+    throw new ResponseError(404, "user tidak ditemukan");
   }
   return user;
+};
+
+const getUsers = async (user_id) => {
+  user_id = validate(getUserValidation, user_id);
+
+  const checkUserInDatabase = await prismaClient.user.findUnique({
+    where: {
+      user_id: user_id,
+    },
+    select: {
+      role: true,
+    },
+  });
+
+  if (!checkUserInDatabase) {
+    throw new ResponseError(404, "user tidak ditemukan");
+  }
+
+  if (checkUserInDatabase.role !== "admin") {
+    throw new ResponseError(403, "user tidak memiliki izin");
+  }
+
+  return prismaClient.user.findMany();
 };
 
 const update = async (request) => {
@@ -210,7 +241,7 @@ const update = async (request) => {
   });
 
   if (checkUserInDatabase != 1) {
-    throw new ResponseError(404, "user is not found");
+    throw new ResponseError(404, "user tidak ditemukan");
   }
 
   const data = {};
@@ -233,6 +264,86 @@ const update = async (request) => {
   }
   if (user.name) {
     data.name = user.name;
+  }
+  if (user.user_phone) {
+    // Check for existing phone number
+    const existingPhone = await prismaClient.user.findFirst({
+      where: {
+        user_phone: user.user_phone,
+      },
+    });
+
+    if (existingPhone) {
+      throw new ResponseError(400, "Nomor telepon sudah digunakan");
+    } else {
+      data.user_phone = user.user_phone;
+    }
+  }
+
+  return prismaClient.user.update({
+    where: {
+      user_id: user.user_id,
+    },
+    data: data,
+    select: {
+      username: true,
+      name: true,
+      user_phone: true,
+    },
+  });
+};
+
+const updateUsers = async (request) => {
+  const user = validate(updateUsersValidation, request);
+
+  const checkUserInDatabase = await prismaClient.user.findUnique({
+    where: {
+      user_id: user.user_id_token,
+    },
+    select: {
+      role: true,
+    },
+  });
+
+  if (!checkUserInDatabase) {
+    throw new ResponseError(404, "user tidak ditemukan");
+  }
+
+  if (checkUserInDatabase.role !== "admin") {
+    throw new ResponseError(403, "user tidak memiliki izin");
+  }
+  const checkUserId = await prismaClient.user.count({
+    where: {
+      user_id: user.user_id,
+    },
+  });
+
+  if (checkUserId !== 1) {
+    throw new ResponseError(404, "user_id tidak ditemukan");
+  }
+  const data = {};
+  if (user.username) {
+    // Check for existing username
+    const existingUsername = await prismaClient.user.findFirst({
+      where: {
+        username: user.username,
+      },
+    });
+
+    if (existingUsername) {
+      throw new ResponseError(400, "Username sudah digunakan");
+    } else {
+      data.username = user.username;
+    }
+  }
+  if (user.password) {
+    data.password = await bcrypt.hash(user.password, 10);
+  }
+  if (user.name) {
+    data.name = user.name;
+  }
+  if (user.role) {
+    data.role = user.role;
   }
   if (user.user_phone) {
     // Check for existing phone number
@@ -286,10 +397,49 @@ const logout = async (username) => {
   });
 };
 
+const deleteUsers = async (request) => {
+  const user = validate(deleteUsersValidation, request);
+
+  const checkUserInDatabase = await prismaClient.user.findUnique({
+    where: {
+      user_id: user.user_id_token,
+    },
+    select: {
+      role: true,
+    },
+  });
+
+  if (!checkUserInDatabase) {
+    throw new ResponseError(404, "user tidak ditemukan");
+  }
+
+  if (checkUserInDatabase.role !== "admin") {
+    throw new ResponseError(403, "user tidak memiliki izin");
+  }
+  const checkUserId = await prismaClient.user.count({
+    where: {
+      user_id: user.user_id,
+    },
+  });
+
+  if (checkUserId !== 1) {
+    throw new ResponseError(404, "user_id tidak ditemukan");
+  }
+
+  return prismaClient.user.delete({
+    where: {
+      user_id: user.user_id,
+    },
+  });
+};
 export default {
   register,
   login,
   get,
   update,
   logout,
+  create,
+  getUsers,
+  updateUsers,
+  deleteUsers,
 };
