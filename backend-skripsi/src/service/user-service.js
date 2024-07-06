@@ -1,5 +1,6 @@
 import { validate } from "../validation/validation.js";
 import {
+  createUserValidation,
   getUserValidation,
   loginUserValidation,
   registerUserValidation,
@@ -71,6 +72,68 @@ const register = async (request) => {
       password: user.password,
       user_phone: user.user_phone,
       role: role,
+    },
+    select: {
+      username: true,
+      name: true,
+      user_phone: true,
+    },
+  });
+};
+
+const create = async (request) => {
+  const user = validate(createUserValidation, request);
+
+  // Menggunakan Promise.all untuk menjalankan query secara paralel
+  const [checkUserInDatabase, existingUsername, existingPhone] =
+    await Promise.all([
+      prismaClient.user.findUnique({
+        where: {
+          user_id: user.user_id,
+        },
+        select: {
+          role: true,
+        },
+      }),
+      prismaClient.user.findFirst({
+        where: {
+          username: user.username,
+        },
+      }),
+      prismaClient.user.findFirst({
+        where: {
+          user_phone: user.user_phone,
+        },
+      }),
+    ]);
+
+  if (!checkUserInDatabase) {
+    throw new ResponseError(404, "User tidak ditemukan");
+  }
+
+  if (checkUserInDatabase.role !== "admin") {
+    throw new ResponseError(403, "User tidak memiliki izin");
+  }
+
+  if (existingUsername) {
+    throw new ResponseError(400, "Username sudah digunakan");
+  }
+
+  if (existingPhone) {
+    throw new ResponseError(400, "Nomor telepon sudah digunakan");
+  }
+
+  user.password = await bcrypt.hash(user.password, 10);
+  user.user_id = await generateUserId();
+
+  return prismaClient.user.create({
+    data: {
+      user_id: user.user_id,
+      name: user.name,
+      username: user.username,
+      password: user.password,
+      user_phone: user.user_phone,
+      role: user.role,
     },
     select: {
       username: true,

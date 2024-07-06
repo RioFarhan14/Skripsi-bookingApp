@@ -1,4 +1,19 @@
+import { Role } from "@prisma/client";
 import Joi from "joi";
+
+const createUserValidation = Joi.object({
+  user_id: Joi.string().min(11).max(11).required(),
+  username: Joi.string().min(3).max(15).required(),
+  password: Joi.string().min(3).max(64).required(),
+  confirm_password: Joi.ref("password"),
+  Role: Joi.string().min(4).max(5).required(),
+  name: Joi.string().max(60).required(),
+  user_phone: Joi.string()
+    .min(11)
+    .max(13)
+    .pattern(/^[0-9]+$/)
+    .required(),
+});
 
 const registerUserValidation = Joi.object({
   username: Joi.string().min(3).max(15).required(),
@@ -35,4 +50,5 @@ export {
   loginUserValidation,
   getUserValidation,
   updateUserValidation,
+  createUserValidation,
 };
