@@ -3,6 +3,7 @@ import userController from "../controller/user-controller.js";
 import productController from "../controller/product-controller.js";
 import { authMiddleware } from "../middleware/auth-middleware.js";
 import helpController from "../controller/help-controller.js";
+import bookingController from "../controller/booking-controller.js";
 
 const userRouter = new express.Router();
 userRouter.use(authMiddleware);
@@ -33,5 +34,8 @@ userRouter.get("/api/users/help", helpController.get);
 userRouter.post("/api/users/help", helpController.create);
 userRouter.patch("/api/users/help", helpController.update);
 userRouter.delete("/api/users/help", helpController.deleteHelp);
+
+//BookingService
+userRouter.get("/api/users/bookings", bookingController.get);
 
 export { userRouter };

@@ -5,30 +5,31 @@ import {
   createTestAdmin,
   createTestUser,
   createTestUser2,
+  getFormattedDate,
   removeTestAdmin,
   removeTestUser,
   removeTestUser2,
+  removeTestUsername,
 } from "./test-utils.js";
-import { prismaClient } from "../application/database.js";
 
 describe("POST /api/users/create", function () {
   beforeEach(async () => {
-    await createTestUser();
+    await createTestUser2();
     await createTestAdmin();
   });
   afterEach(async () => {
-    await removeTestUser();
-    await removeTestAdmin();
     await removeTestUser2();
+    await removeTestAdmin();
+    await removeTestUsername();
   });
   it("should can create user", async () => {
     const result = await supertest(web)
       .post("/api/users/create")
       .set("Authorization", "admin")
       .send({
-        username: "Riofarhan",
+        username: "test",
         name: "Cassilas",
-        user_phone: "12345678911",
+        user_phone: "12345670000",
         role: "user",
         password: "12345678",
       });
@@ -56,7 +57,7 @@ describe("POST /api/users/create", function () {
   it("should reject create if role not admin", async () => {
     const result = await supertest(web)
       .post("/api/users/create")
-      .set("Authorization", "test")
+      .set("Authorization", "test2")
       .send({
         username: "cassilas",
         name: "Cassilas",
@@ -72,7 +73,7 @@ describe("POST /api/users/create", function () {
   it("should reject create if request invalid", async () => {
     const result = await supertest(web)
       .post("/api/users/create")
-      .set("Authorization", "test")
+      .set("Authorization", "test2")
       .send({
         username: "cassilas",
         name: "Cassilas",
@@ -96,11 +97,12 @@ describe("PATCH /api/users/update", function () {
   });
 
   it("should can update data users", async () => {
+    const date = getFormattedDate();
     const result = await supertest(web)
       .patch("/api/users/update")
       .set("Authorization", "admin")
       .send({
-        user_id: "00202060724",
+        user_id: `00102${date}`,
         name: "Cassilas",
       });
     expect(result.status).toBe(200);
@@ -108,11 +110,12 @@ describe("PATCH /api/users/update", function () {
   });
 
   it("should reject update if token invalid", async () => {
+    const date = getFormattedDate();
     const result = await supertest(web)
       .patch("/api/users/update")
       .set("Authorization", "")
       .send({
-        user_id: "00202060724",
+        user_id: `00102${date}`,
         username: "cassilas",
         name: "Cassilas",
       });
@@ -122,11 +125,12 @@ describe("PATCH /api/users/update", function () {
   });
 
   it("should reject update if role not admin", async () => {
+    const date = getFormattedDate();
     const result = await supertest(web)
       .patch("/api/users/update")
       .set("Authorization", "test")
       .send({
-        user_id: "00202060724",
+        user_id: `00102${date}`,
         name: "Cassilas",
       });
 
@@ -158,33 +162,36 @@ describe("DELETE /api/users/delete", function () {
   });
 
   it("should can delete users", async () => {
+    const date = getFormattedDate();
     const result = await supertest(web)
       .delete("/api/users/delete")
       .set("Authorization", "admin")
       .send({
-        user_id: "00102060724",
+        user_id: `00102${date}`,
       });
     expect(result.status).toBe(200);
     expect(result.body.data).toBe("Behasil Dihapus");
   });
 
   it("should reject delete if token invalid", async () => {
+    const date = getFormattedDate();
     const result = await supertest(web)
       .delete("/api/users/delete")
       .set("Authorization", "")
       .send({
-        user_id: "00102060724",
+        user_id: `00102${date}`,
       });
     expect(result.status).toBe(401);
     expect(result.body.errors).toBeDefined();
   });
 
   it("should reject delete if role not admin", async () => {
+    const date = getFormattedDate();
     const result = await supertest(web)
       .delete("/api/users/delete")
       .set("Authorization", "test")
       .send({
-        user_id: "00102060724",
+        user_id: `00102${date}`,
       });
     expect(result.status).toBe(403);
     expect(result.body.errors).toBeDefined();
@@ -202,7 +209,7 @@ describe("DELETE /api/users/delete", function () {
 
 describe("POST /api/users", function () {
   afterEach(async () => {
-    await removeTestUser();
+    await removeTestUsername();
   });
 
   it("should can register new user", async () => {
@@ -213,6 +220,7 @@ describe("POST /api/users", function () {
       name: "test",
       user_phone: "0812345678910",
     });
+    logger.info(result.body);
     expect(result.status).toBe(200);
     expect(result.body.data.username).toBe("test");
     expect(result.body.data.name).toBe("test");

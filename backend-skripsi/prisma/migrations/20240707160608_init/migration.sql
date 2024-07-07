@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE `users` (
-    `user_id` INTEGER NOT NULL,
+    `user_id` VARCHAR(11) NOT NULL,
     `username` VARCHAR(15) NOT NULL,
     `password` VARCHAR(64) NOT NULL,
     `name` VARCHAR(60) NOT NULL,
@@ -27,8 +27,8 @@ CREATE TABLE `products` (
 
 -- CreateTable
 CREATE TABLE `memberships` (
-    `membership_id` INTEGER NOT NULL,
-    `user_id` INTEGER NOT NULL,
+    `membership_id` VARCHAR(12) NOT NULL,
+    `user_id` VARCHAR(11) NOT NULL,
     `start_date` DATETIME(3) NOT NULL,
     `end_date` DATETIME(3) NOT NULL,
 
@@ -37,8 +37,8 @@ CREATE TABLE `memberships` (
 
 -- CreateTable
 CREATE TABLE `notifications` (
-    `notification_id` INTEGER NOT NULL,
-    `user_id` INTEGER NOT NULL,
+    `notification_id` VARCHAR(8) NOT NULL,
+    `user_id` VARCHAR(11) NOT NULL,
     `message` VARCHAR(225) NOT NULL,
     `notification_date` DATETIME(3) NOT NULL,
     `status` ENUM('read', 'unread') NOT NULL,
@@ -48,10 +48,10 @@ CREATE TABLE `notifications` (
 
 -- CreateTable
 CREATE TABLE `bookings` (
-    `booking_id` INTEGER NOT NULL,
-    `user_id` INTEGER NOT NULL,
+    `booking_id` VARCHAR(12) NOT NULL,
+    `user_id` VARCHAR(11) NOT NULL,
     `product_id` INTEGER NOT NULL,
-    `status` ENUM('booked', 'pending') NOT NULL,
+    `status` ENUM('booked', 'pending', 'cancelled', 'completed') NOT NULL,
     `booking_date` DATETIME(3) NOT NULL,
     `start_time` DATETIME(3) NOT NULL,
     `end_time` DATETIME(3) NOT NULL,
@@ -61,11 +61,11 @@ CREATE TABLE `bookings` (
 
 -- CreateTable
 CREATE TABLE `transactions` (
-    `transaction_id` INTEGER NOT NULL,
-    `user_id` INTEGER NOT NULL,
+    `transaction_id` VARCHAR(12) NOT NULL,
+    `user_id` VARCHAR(191) NOT NULL,
     `transaction_date` DATETIME(3) NOT NULL,
     `metode_pembayaran` ENUM('gopay', 'mandiri', 'bca', 'shopeePay') NOT NULL,
-    `status` ENUM('success', 'pending', 'failed') NOT NULL,
+    `status` ENUM('paid', 'pending', 'failed') NOT NULL,
     `discount` INTEGER NULL,
     `total_amount` INTEGER NOT NULL,
 
@@ -74,13 +74,22 @@ CREATE TABLE `transactions` (
 
 -- CreateTable
 CREATE TABLE `transaction_details` (
-    `transaction_detail_id` INTEGER NOT NULL,
-    `transaction_id` INTEGER NOT NULL,
+    `transaction_detail_id` INTEGER NOT NULL AUTO_INCREMENT,
+    `transaction_id` VARCHAR(191) NOT NULL,
     `product_id` INTEGER NOT NULL,
     `quantity` INTEGER NOT NULL,
     `unit_price` INTEGER NOT NULL,
 
     PRIMARY KEY (`transaction_detail_id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Help` (
+    `help_id` INTEGER NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(60) NOT NULL,
+    `message` VARCHAR(225) NOT NULL,
+
+    PRIMARY KEY (`help_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey

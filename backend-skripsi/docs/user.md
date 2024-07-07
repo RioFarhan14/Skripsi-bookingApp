@@ -162,6 +162,39 @@ Response Body Success :
 
 ```json
 {
+  "data": [
+    {
+      "name": "Rahmat",
+      "username": "rahmat01",
+      "user_phone": "082XXXXXXX"
+    },
+    {
+      "name": "ali",
+      "username": "ali01",
+      "user_phone": "082XXXXXXX"
+    }
+  ]
+}
+```
+
+Response Body Error :
+
+```json
+{
+  "errors": "Silahkan login terlebih dahulu"
+}
+```
+
+## get user data API
+
+Endpoint : GET /api/users/current
+
+header: - token
+
+Response Body :
+
+```json
+{
   "data": {
     "name": "Rahmat",
     "username": "rahmat01",
@@ -257,35 +290,6 @@ Response Body Success :
 ```json
 {
   "data": "OK"
-}
-```
-
-Response Body Error :
-
-```json
-{
-  "errors": "Silahkan login terlebih dahulu"
-}
-```
-
-## Get Notification User API
-
-Endpoint : GET /api/users/current/notification
-
-Headers :
-
-- Authorization : token
-
-Response Body Success :
-
-```json
-{
-  "data": {
-    "notification_id": "01",
-    "message": "15 menit lagi waktu bermain segera tiba, Persiapkan dirimu",
-    "notification_date": "2024-01-24 18:00:00",
-    "status": "Unread"
-  }
 }
 ```
 

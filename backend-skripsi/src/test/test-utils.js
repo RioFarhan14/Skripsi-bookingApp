@@ -1,6 +1,7 @@
 import { prismaClient } from "../application/database.js";
 import bcrypt from "bcrypt";
-export const removeTestUser = async () => {
+
+export const removeTestUsername = async () => {
   const result = await prismaClient.user.count({
     where: {
       username: "test",
@@ -16,10 +17,11 @@ export const removeTestUser = async () => {
   });
 };
 
-export const removeTestUser2 = async () => {
+export const removeTestUser = async () => {
+  const date = getFormattedDate();
   const result = await prismaClient.user.count({
     where: {
-      username: "Riofarhan",
+      user_id: `00102${date}`,
     },
   });
   if (result !== 1) {
@@ -27,15 +29,40 @@ export const removeTestUser2 = async () => {
   }
   return await prismaClient.user.delete({
     where: {
-      username: "Riofarhan",
+      user_id: `00102${date}`,
+    },
+  });
+};
+export const removeTestUser2 = async () => {
+  const date = getFormattedDate();
+  const result = await prismaClient.user.count({
+    where: {
+      user_id: `00202${date}`,
+    },
+  });
+  if (result !== 1) {
+    return;
+  }
+  return await prismaClient.user.delete({
+    where: {
+      user_id: `00202${date}`,
     },
   });
 };
 
 export const removeTestAdmin = async () => {
-  await prismaClient.user.delete({
+  const date = getFormattedDate();
+  const result = await prismaClient.user.count({
     where: {
-      username: "admin",
+      user_id: `00301${date}`,
+    },
+  });
+  if (result !== 1) {
+    return;
+  }
+  return await prismaClient.user.delete({
+    where: {
+      user_id: `00301${date}`,
     },
   });
 };
@@ -70,33 +97,12 @@ export const removeTestProductMembership = async () => {
     },
   });
 };
-const generateUserId = async () => {
-  const lastUser = await prismaClient.user.findFirst({
-    orderBy: {
-      user_id: "desc",
-    },
-  });
 
-  let newIdNumber = 1;
-  if (lastUser && lastUser.user_id) {
-    const lastIdNumber = parseInt(lastUser.user_id.slice(0, 3), 10);
-    newIdNumber = lastIdNumber + 1;
-  }
-
-  const date = new Date();
-  const formattedDate = `${date.getDate().toString().padStart(2, "0")}${(
-    date.getMonth() + 1
-  )
-    .toString()
-    .padStart(2, "0")}${date.getFullYear().toString().slice(-2)}`;
-
-  const userId = `${newIdNumber.toString().padStart(3, "0")}02${formattedDate}`;
-  return userId;
-};
 export const createTestUser = async () => {
+  const date = getFormattedDate();
   await prismaClient.user.create({
     data: {
-      user_id: await generateUserId(),
+      user_id: `00102${date}`,
       username: "test",
       password: await bcrypt.hash("1234567890", 10),
       name: "test",
@@ -108,9 +114,10 @@ export const createTestUser = async () => {
 };
 
 export const createTestUser2 = async () => {
+  const date = getFormattedDate();
   await prismaClient.user.create({
     data: {
-      user_id: await generateUserId(),
+      user_id: `00202${date}`,
       username: "Riofarhan",
       password: await bcrypt.hash("1234567890", 10),
       name: "test",
@@ -122,9 +129,10 @@ export const createTestUser2 = async () => {
 };
 
 export const createTestAdmin = async () => {
+  const date = getFormattedDate();
   await prismaClient.user.create({
     data: {
-      user_id: await generateUserId(),
+      user_id: `00301${date}`,
       username: "admin",
       password: await bcrypt.hash("1234567890", 10),
       name: "admin",
@@ -151,6 +159,7 @@ export const createTestProduct = async () => {
 export const createProductField = async () => {
   await prismaClient.product.create({
     data: {
+      product_id: 2,
       product_name: "Lapangan A",
       product_type: "field",
       price: 100000,
@@ -161,6 +170,7 @@ export const createProductField = async () => {
 
   await prismaClient.product.create({
     data: {
+      product_id: 3,
       product_name: "Lapangan B",
       product_type: "field",
       price: 100000,
@@ -171,6 +181,7 @@ export const createProductField = async () => {
 
   await prismaClient.product.create({
     data: {
+      product_id: 4,
       product_name: "Lapangan C",
       product_type: "field",
       price: 100000,
@@ -234,6 +245,54 @@ export const removeHelpTest = async () => {
   return prismaClient.help.deleteMany({
     where: {
       title: "Booking",
+    },
+  });
+};
+
+export const getFormattedDate = () => {
+  const today = new Date(); // Mendapatkan tanggal hari ini
+
+  // Ambil tanggal, bulan, dan tahun dari today
+  const day = String(today.getDate()).padStart(2, "0"); // Mendapatkan tanggal dengan leading zero jika kurang dari 10
+  const month = String(today.getMonth() + 1).padStart(2, "0"); // Mendapatkan bulan dengan leading zero jika kurang dari 10
+  const year = today.getFullYear().toString().slice(-2); // Mendapatkan dua digit terakhir tahun
+
+  // Gabungkan tanggal, bulan, dan tahun dalam format yang diinginkan (DDMMYY)
+  const formattedDate = `${day}${month}${year}`;
+
+  return formattedDate;
+};
+
+export const createTestBooking = async () => {
+  const date = getFormattedDate();
+  const timeOnly = new Date("2024-07-07T18:00:00");
+  const dateOnly = new Date("2024-07-07");
+  return await prismaClient.booking.create({
+    data: {
+      booking_id: `001001${date}`,
+      status: "booked",
+      booking_date: dateOnly,
+      start_time: timeOnly,
+      end_time: timeOnly,
+      user: {
+        connect: {
+          user_id: `00102${date}`,
+        },
+      },
+      product: {
+        connect: {
+          product_id: 2,
+        },
+      },
+    },
+  });
+};
+
+export const removeTestBooking = async () => {
+  const date = getFormattedDate();
+  return await prismaClient.booking.delete({
+    where: {
+      booking_id: `001001${date}`,
     },
   });
 };
