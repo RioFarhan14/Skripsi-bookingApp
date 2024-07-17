@@ -51,10 +51,10 @@ CREATE TABLE `bookings` (
     `booking_id` VARCHAR(12) NOT NULL,
     `user_id` VARCHAR(11) NOT NULL,
     `product_id` INTEGER NOT NULL,
-    `status` ENUM('booked', 'pending', 'cancelled', 'completed') NOT NULL,
-    `booking_date` DATETIME(3) NOT NULL,
-    `start_time` DATETIME(3) NOT NULL,
-    `end_time` DATETIME(3) NOT NULL,
+    `status` ENUM('Ongoing', 'booked', 'pending', 'cancelled', 'completed') NOT NULL,
+    `booking_date` VARCHAR(10) NOT NULL,
+    `start_time` VARCHAR(5) NOT NULL,
+    `end_time` VARCHAR(5) NOT NULL,
 
     PRIMARY KEY (`booking_id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

@@ -2,62 +2,255 @@ import { request } from "express";
 import { validate } from "../validation/validation.js";
 import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
-import { getBookingValidation } from "../validation/booking-validation.js";
+import {
+  createBookingValidation,
+  deleteBookingValidation,
+  getBookingByIdValidation,
+  getBookingByProductAndDateValidation,
+  getUserBookingValidation,
+  updateBookingValidation,
+} from "../validation/booking-validation.js";
+import { getCurrentTime, getDuration, getEndTime } from "../utils/timeUtils.js";
+import { validateMembership, validateUser } from "../utils/validate.js";
+import {
+  calculateEndTime,
+  generateBookingId,
+  validateBookingId,
+  validateLimitTime,
+  validateSchedule,
+} from "../helpers/bookingHelpers.js";
 
-const get = async (request) => {
-  const user = validate(getBookingValidation, request);
+const getAllBooking = async (user_id) => {
+  user_id = validate(getUserBookingValidation, user_id);
 
   // Cek apakah user ada di database
-  const checkUserInDatabase = await prismaClient.user.count({
-    where: {
-      user_id: user.user_id,
-    },
-  });
+  const checkUserInDatabase = await validateUser(user_id);
 
-  if (checkUserInDatabase !== 1) {
-    throw new ResponseError(404, "user tidak ditemukan");
+  if (checkUserInDatabase.role !== "admin") {
+    throw new ResponseError(403, "User tidak memiliki izin");
   }
 
-  // Cek jika product_id dan booking_date keduanya ada
-  if (user.product_id && user.booking_date) {
-    const result = await prismaClient.booking.findMany({
-      where: {
-        product_id: user.product_id,
-        booking_date: user.booking_date,
-        status: "booked",
+  return prismaClient.booking.findMany();
+};
+
+const getBookingByProductAndDate = async (request) => {
+  const user = validate(getBookingByProductAndDateValidation, request);
+
+  // Cek apakah user ada di database
+  await validateUser(user.user_id);
+
+  const result = await prismaClient.booking.findMany({
+    where: {
+      product_id: user.product_id,
+      booking_date: user.booking_date,
+      status: "Booked",
+    },
+    select: {
+      booking_id: true,
+      booking_date: true,
+      start_time: true,
+      end_time: true,
+      user: {
+        select: {
+          name: true,
+        },
       },
-      select: {
-        booking_id: true,
-        booking_date: true,
-        start_time: true,
-        end_time: true,
+    },
+  });
+  return result;
+};
+
+const getBookingById = async (request) => {
+  const user = validate(getBookingByIdValidation, request);
+
+  await validateUser(user.user_id);
+
+  const set = { booking_id: user.booking_id };
+  const result = await validateBookingId(set);
+
+  return result;
+};
+
+const getUserBooking = async (user_id) => {
+  user_id = validate(getUserBookingValidation, user_id);
+
+  await validateUser(user_id);
+
+  return prismaClient.booking.findMany({
+    where: {
+      user_id: user_id,
+      OR: [{ status: "Booked" }, { status: "Ongoing" }, { status: "Pending" }],
+    },
+    select: {
+      booking_id: true,
+      status: true,
+      start_time: true,
+    },
+  });
+};
+
+const createBooking = async (request) => {
+  const data = validate(createBookingValidation, request);
+  const checkUserInDatabase = await validateUser(data.user_id_token);
+
+  const status = "Pending";
+
+  data.end_time = calculateEndTime(data.start_time, data.duration);
+
+  // Cek waktu tidak boleh kurang dari 09:00 dan lebih dari 22:00
+
+  const startLimit = "09:00";
+  const endLimit = "22:00";
+
+  if (data.start_time < startLimit || data.end_time > endLimit) {
+    throw new ResponseError(
+      400,
+      "waktu harus lebih dari 09:00 dan kurang dari 22:00"
+    );
+  }
+
+  // Cek jadwal yang bertabrakan
+  await validateSchedule(data);
+
+  if (checkUserInDatabase.role === "user") {
+    data.booking_id = await generateBookingId(data.user_id_token);
+    await prismaClient.booking.create({
+      data: {
+        booking_id: data.booking_id,
+        status: status,
+        booking_date: data.booking_date,
+        start_time: data.start_time,
+        end_time: data.end_time,
         user: {
-          select: {
-            name: true,
+          connect: {
+            user_id: data.user_id_token,
+          },
+        },
+        product: {
+          connect: {
+            product_id: data.product_id,
           },
         },
       },
     });
 
-    if (!result || result.length === 0) {
-      return;
-    }
+    const result = {};
+    result.user_id_token = data.user_id_token;
+    result.product_id = data.product_id;
+    result.quantity = data.duration;
     return result;
   }
+  if (!data.user_id) {
+    throw new ResponseError(400, "Masukkan user_id");
+  }
+  data.booking_id = await generateBookingId(data.user_id_token);
+  await prismaClient.booking.create({
+    data: {
+      booking_id: data.booking_id,
+      status: status,
+      booking_date: data.booking_date,
+      start_time: data.start_time,
+      end_time: data.end_time,
+      user: {
+        connect: {
+          user_id: data.user_id,
+        },
+      },
+      product: {
+        connect: {
+          product_id: data.product_id,
+        },
+      },
+    },
+  });
 
-  // Jika hanya salah satu dari product_id atau booking_date yang ada, lempar error
-  if (user.product_id || user.booking_date) {
-    if (!user.product_id) {
-      throw new ResponseError(400, "Lapangan belum dipilih");
-    } else {
-      throw new ResponseError(400, "tanggal belum diisi");
+  const result = {};
+  result.user_id_token = data.user_id_token;
+  result.user_id = data.user_id;
+  result.product_id = data.product_id;
+  result.quantity = data.duration;
+  return result;
+};
+
+const update = async (request) => {
+  const user = validate(updateBookingValidation, request);
+  const set = {};
+  set.booking_id = user.booking_id;
+  const checkUserInDatabase = await validateUser(user.user_id);
+
+  if (checkUserInDatabase.role === "user") {
+    const currentTime = getCurrentTime();
+    set.user_id = user.user_id;
+    const checkMembership = await validateMembership(set.user_id, currentTime);
+
+    if (!checkMembership) {
+      throw new ResponseError(403, "User tidak memiliki izin");
     }
   }
 
-  // Jika tidak ada parameter, kembalikan semua data booking
-  return prismaClient.booking.findMany();
+  const checkBookingId = await validateBookingId(set);
+
+  const duration = getDuration(
+    checkBookingId.start_time,
+    checkBookingId.end_time
+  );
+
+  // Cek user.start_time tidak ada gunakan checkBookingId.start_time
+  user.start_time = user.start_time
+    ? user.start_time
+    : checkBookingId.start_time;
+
+  // Cek user.booking_date jika tidak ada gunakan checkBookingId.booking_date
+  user.booking_date = user.booking_date
+    ? user.booking_date
+    : checkBookingId.booking_date;
+
+  // Cek user.product_id jika tidak ada gunakan  checkBookingId.product_id
+  user.product_id = user.product_id
+    ? user.product_id
+    : checkBookingId.product_id;
+
+  user.end_time = getEndTime(user.start_time, duration);
+
+  // Cek waktu tidak boleh kurang dari 09:00 dan lebih dari 22:00
+  validateLimitTime(user.start_time, user.end_time);
+
+  // Cek jadwal yang bertabrakan
+  await validateSchedule(user);
+
+  const { user_id, ...otherData } = user;
+
+  const data = { ...otherData };
+
+  return prismaClient.booking.update({
+    where: {
+      booking_id: data.booking_id,
+    },
+    data: data,
+  });
 };
 
+const deleteBooking = async (request) => {
+  const user = validate(deleteBookingValidation, request);
+
+  const checkUserInDatabase = await validateUser(user.user_id);
+
+  if (checkUserInDatabase.role !== "admin") {
+    throw new ResponseError(403, "user tidak memiliki izin akses");
+  }
+
+  return prismaClient.booking.delete({
+    where: {
+      booking_id: user.booking_id,
+    },
+  });
+};
 export default {
-  get,
+  getAllBooking,
+  getBookingById,
+  getBookingByProductAndDate,
+  getUserBooking,
+  createBooking,
+  update,
+  deleteBooking,
 };

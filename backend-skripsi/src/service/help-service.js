@@ -8,36 +8,19 @@ import {
   getHelpValidation,
   updateHelpValidation,
 } from "../validation/help-validation.js";
+import { validateUser } from "../utils/validate.js";
 
 const get = async (user_id) => {
   user_id = validate(getHelpValidation, user_id);
 
-  const checkUserInDatabase = await prismaClient.user.count({
-    where: {
-      user_id: user_id,
-    },
-  });
-  if (checkUserInDatabase != 1) {
-    throw new ResponseError(404, "user tidak ditemukan");
-  }
+  await validateUser(user_id);
 
   return prismaClient.help.findMany();
 };
 
 const create = async (request) => {
   const user = validate(createHelpValidation, request);
-  const checkUserInDatabase = await prismaClient.user.findUnique({
-    where: {
-      user_id: user.user_id,
-    },
-    select: {
-      role: true,
-    },
-  });
-
-  if (!checkUserInDatabase) {
-    throw new ResponseError(404, "user tidak ditemukan");
-  }
+  const checkUserInDatabase = await validateUser(user.user_id);
 
   if (checkUserInDatabase.role !== "admin") {
     throw new ResponseError(403, "user tidak memiliki izin");
@@ -56,18 +39,7 @@ const create = async (request) => {
 
 const update = async (request) => {
   const user = validate(updateHelpValidation, request);
-  const checkUserInDatabase = await prismaClient.user.findUnique({
-    where: {
-      user_id: user.user_id,
-    },
-    select: {
-      role: true,
-    },
-  });
-
-  if (!checkUserInDatabase) {
-    throw new ResponseError(404, "user tidak ditemukan");
-  }
+  const checkUserInDatabase = await validateUser(user.user_id);
 
   if (checkUserInDatabase.role !== "admin") {
     throw new ResponseError(403, "user tidak memiliki izin");
@@ -100,18 +72,7 @@ const update = async (request) => {
 const deleteHelp = async (request) => {
   const user = validate(deleteHelpValidation, request);
 
-  const checkUserInDatabase = await prismaClient.user.findUnique({
-    where: {
-      user_id: user.user_id,
-    },
-    select: {
-      role: true,
-    },
-  });
-
-  if (!checkUserInDatabase) {
-    throw new ResponseError(404, "user tidak ditemukan");
-  }
+  const checkUserInDatabase = await validateUser(user.user_id);
 
   if (checkUserInDatabase.role !== "admin") {
     throw new ResponseError(403, "user tidak memiliki izin");

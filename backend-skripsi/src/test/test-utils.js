@@ -1,5 +1,10 @@
 import { prismaClient } from "../application/database.js";
 import bcrypt from "bcrypt";
+import {
+  formattedDate,
+  getCurrentTime,
+  getEndDate,
+} from "../utils/timeUtils.js";
 
 export const removeTestUsername = async () => {
   const result = await prismaClient.user.count({
@@ -194,6 +199,7 @@ export const createProductField = async () => {
 export const createProductMembership = async () => {
   await prismaClient.product.create({
     data: {
+      product_id: 5,
       product_name: "Membership 1 Bulan",
       product_type: "membership",
       price: 100000,
@@ -204,6 +210,7 @@ export const createProductMembership = async () => {
 
   await prismaClient.product.create({
     data: {
+      product_id: 6,
       product_name: "Membership 2 Bulan",
       product_type: "membership",
       price: 100000,
@@ -214,6 +221,7 @@ export const createProductMembership = async () => {
 
   await prismaClient.product.create({
     data: {
+      product_id: 7,
       product_name: "Membership 3 Bulan",
       product_type: "membership",
       price: 100000,
@@ -250,7 +258,16 @@ export const removeHelpTest = async () => {
 };
 
 export const getFormattedDate = () => {
-  const today = new Date(); // Mendapatkan tanggal hari ini
+  // Mendapatkan waktu saat ini dalam UTC
+  const now = new Date();
+
+  // Mengubah waktu menjadi string lokal di zona waktu Jakarta
+  const jakartaTimeString = now.toLocaleString("en-US", {
+    timeZone: "Asia/Jakarta",
+  });
+
+  // Membuat objek Date baru dari string lokal
+  const today = new Date(jakartaTimeString);
 
   // Ambil tanggal, bulan, dan tahun dari today
   const day = String(today.getDate()).padStart(2, "0"); // Mendapatkan tanggal dengan leading zero jika kurang dari 10
@@ -265,15 +282,13 @@ export const getFormattedDate = () => {
 
 export const createTestBooking = async () => {
   const date = getFormattedDate();
-  const timeOnly = new Date("2024-07-07T18:00:00");
-  const dateOnly = new Date("2024-07-07");
-  return await prismaClient.booking.create({
+  return prismaClient.booking.create({
     data: {
       booking_id: `001001${date}`,
-      status: "booked",
-      booking_date: dateOnly,
-      start_time: timeOnly,
-      end_time: timeOnly,
+      status: "Booked",
+      booking_date: "2024-07-07",
+      start_time: "18:00",
+      end_time: "19:00",
       user: {
         connect: {
           user_id: `00102${date}`,
@@ -290,9 +305,54 @@ export const createTestBooking = async () => {
 
 export const removeTestBooking = async () => {
   const date = getFormattedDate();
-  return await prismaClient.booking.delete({
+  const result = await prismaClient.booking.count({
     where: {
       booking_id: `001001${date}`,
     },
   });
+
+  if (result < 1) {
+    return;
+  }
+  return prismaClient.booking.delete({
+    where: {
+      booking_id: `001001${date}`,
+    },
+  });
+};
+
+export const removeManyTestBooking = async () => {
+  return await prismaClient.booking.deleteMany({});
+};
+
+export const createTestMembership = () => {
+  const date = getFormattedDate();
+  const start_date = getCurrentTime();
+  const end_date = getEndDate(start_date, 30);
+  return prismaClient.membership.create({
+    data: {
+      membership_id: `001001${date}`,
+      start_date: start_date,
+      end_date: end_date,
+      user: {
+        connect: {
+          user_id: `00102${date}`,
+        },
+      },
+    },
+  });
+};
+
+export const removeTestMembership = () => {
+  const date = getFormattedDate();
+  return prismaClient.membership.delete({
+    where: {
+      membership_id: `001001${date}`,
+    },
+  });
+};
+
+export const removeManyTestTransaction = async () => {
+  await prismaClient.transaction_detail.deleteMany();
+  return prismaClient.transaction.deleteMany();
 };

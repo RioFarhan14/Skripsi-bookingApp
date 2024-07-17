@@ -211,7 +211,7 @@ Response Body Error :
 }
 ```
 
-## Login User API
+## Login API
 
 Endpoint : POST /api/users/login
 

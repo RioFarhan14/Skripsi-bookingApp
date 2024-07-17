@@ -4,6 +4,8 @@ import productController from "../controller/product-controller.js";
 import { authMiddleware } from "../middleware/auth-middleware.js";
 import helpController from "../controller/help-controller.js";
 import bookingController from "../controller/booking-controller.js";
+import transactionController from "../controller/transaction-controller.js";
+import multerMiddleware from "../middleware/multer-middleware.js";
 
 const userRouter = new express.Router();
 userRouter.use(authMiddleware);
@@ -25,7 +27,11 @@ userRouter.get(
   "/api/users/products/membership",
   productController.getMembership
 );
-userRouter.post("/api/users/products", productController.create);
+userRouter.post(
+  "/api/users/products",
+  multerMiddleware,
+  productController.create
+);
 userRouter.patch("/api/users/products", productController.update);
 userRouter.delete("/api/users/products", productController.deleteProduct);
 
@@ -36,6 +42,23 @@ userRouter.patch("/api/users/help", helpController.update);
 userRouter.delete("/api/users/help", helpController.deleteHelp);
 
 //BookingService
-userRouter.get("/api/users/bookings", bookingController.get);
+userRouter.get("/api/users/booking", bookingController.getAllBooking);
+userRouter.get(
+  "/api/users/booking/:booking_id",
+  bookingController.getBookingById
+);
+userRouter.get(
+  "/api/users/bookings",
+  bookingController.getBookingByProductAndDate
+);
+userRouter.get("/api/users/current/booking", bookingController.getUserBooking);
+userRouter.post("/api/users/booking", bookingController.create);
+userRouter.patch("/api/users/booking", bookingController.update);
+userRouter.delete("/api/users/booking", bookingController.deleteBooking);
+
+//TransactionService
+userRouter.get("/api/users/transaction", transactionController.getAll);
+userRouter.get("/api/users/current/transaction", transactionController.getUser);
+userRouter.post("/api/users/transaction", transactionController.create);
 
 export { userRouter };

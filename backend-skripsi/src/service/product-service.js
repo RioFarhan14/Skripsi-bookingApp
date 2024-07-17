@@ -9,35 +9,13 @@ import {
 import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
 import { getUserValidation } from "../validation/user-validation.js";
-
-const generateProductId = async () => {
-  const getId = await prismaClient.product.findFirst({
-    orderBy: {
-      product_id: "desc",
-    },
-  });
-  const newIdNumber = 1;
-  if (getId) {
-    newIdNumber = getId.product_id + 1;
-  }
-  return newIdNumber;
-};
+import { generateProductId } from "../utils/generateIdUtils.js";
+import { validateProduct, validateUser } from "../utils/validate.js";
 
 const create = async (request) => {
   const user = validate(createProductValidation, request);
 
-  const checkUserInDatabase = await prismaClient.user.findUnique({
-    where: {
-      user_id: user.user_id,
-    },
-    select: {
-      role: true,
-    },
-  });
-
-  if (!checkUserInDatabase) {
-    throw new ResponseError(404, "user tidak ditemukan");
-  }
+  const checkUserInDatabase = await validateUser(user.user_id);
 
   if (checkUserInDatabase.role !== "admin") {
     throw new ResponseError(403, "User tidak memiliki izin");
@@ -75,14 +53,7 @@ const create = async (request) => {
 
 const get = async (request) => {
   const user = validate(getProductValidation, request);
-  const checkUserInDatabase = await prismaClient.user.count({
-    where: {
-      user_id: user.user_id,
-    },
-  });
-  if (checkUserInDatabase != 1) {
-    throw new ResponseError(404, "user tidak ditemukan");
-  }
+  await validateUser(user.user_id);
 
   if (user.product_id) {
     const product = await prismaClient.product.findUnique({
@@ -102,15 +73,7 @@ const get = async (request) => {
 
 const getField = async (user_id) => {
   user_id = validate(getUserValidation, user_id);
-  const checkUserInDatabase = await prismaClient.user.count({
-    where: {
-      user_id: user_id,
-    },
-  });
-
-  if (checkUserInDatabase !== 1) {
-    throw new ResponseError(404, "user tidak ditemukan");
-  }
+  await validateUser(user_id);
 
   const product = "field";
   return prismaClient.product.findMany({
@@ -122,16 +85,7 @@ const getField = async (user_id) => {
 
 const getMembership = async (user_id) => {
   user_id = validate(getUserValidation, user_id);
-  const checkUserInDatabase = await prismaClient.user.count({
-    where: {
-      user_id: user_id,
-    },
-  });
-
-  if (checkUserInDatabase !== 1) {
-    throw new ResponseError(404, "user tidak ditemukan");
-  }
-
+  await validateUser(user_id);
   const product = "membership";
   return prismaClient.product.findMany({
     where: {
@@ -142,32 +96,13 @@ const getMembership = async (user_id) => {
 
 const update = async (request) => {
   const user = validate(updateProductValidation, request);
-  const checkUserInDatabase = await prismaClient.user.findUnique({
-    where: {
-      user_id: user.user_id,
-    },
-    select: {
-      role: true,
-    },
-  });
-
-  if (!checkUserInDatabase) {
-    throw new ResponseError(404, "user tidak ditemukan");
-  }
+  const checkUserInDatabase = await validateUser(user.user_id);
 
   if (checkUserInDatabase.role !== "admin") {
     throw new ResponseError(403, "user tidak memiliki izin");
   }
 
-  const checkProductInDatabase = await prismaClient.product.count({
-    where: {
-      product_id: user.product_id,
-    },
-  });
-
-  if (checkProductInDatabase !== 1) {
-    throw new ResponseError(404, "Produk tidak ditemukan");
-  }
+  await validateProduct(user.product_id);
 
   // Destrukturisasi user untuk memisahkan user_id dan product_id
   const { user_id, product_id, ...otherData } = user;
@@ -186,18 +121,7 @@ const update = async (request) => {
 const deleteProduct = async (request) => {
   const user = validate(deleteProductValidation, request);
 
-  const checkUserInDatabase = await prismaClient.user.findUnique({
-    where: {
-      user_id: user.user_id,
-    },
-    select: {
-      role: true,
-    },
-  });
-
-  if (!checkUserInDatabase) {
-    throw new ResponseError(404, "user tidak ditemukan");
-  }
+  const checkUserInDatabase = await validateUser(user.user_id);
 
   if (checkUserInDatabase.role !== "admin") {
     throw new ResponseError(403, "user tidak memiliki izin");

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:user_frontend/providers/authProvider.dart';
 import 'package:user_frontend/screens/profile/editProfile.dart';
 import 'package:user_frontend/utils/customBotton1.dart';
 import 'package:user_frontend/utils/theme.dart';
@@ -11,7 +13,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-
+    final authProvider = Provider.of<AuthProvider>(context);
     return Center(
       child: Column(
         children: [
@@ -22,32 +24,34 @@ class ProfilePage extends StatelessWidget {
           ),
           SizedBox(height: screenHeight * 0.04),
           SizedBox(
-            width: screenWidth * 0.8,
-            height: screenHeight * 0.24,
-            child: Column(
-              children: [
-                const TextContainerProfile(
-                  title: 'Nama',
-                  field: 'Rio Farhan Avito',
-                ),
-                SizedBox(height: screenHeight * 0.02),
-                const TextContainerProfile(
-                  title: 'Username',
-                  field: 'Riofarhan1',
-                ),
-                SizedBox(height: screenHeight * 0.02),
-                const TextContainerProfile(
-                  title: 'No Telepon',
-                  field: '08XXXXXXXXX',
-                ),
-                SizedBox(height: screenHeight * 0.02),
-                const TextContainerProfile(
-                  title: 'Status Pengguna',
-                  field: 'Membership',
-                ),
-              ],
-            ),
-          ),
+              width: screenWidth * 0.8,
+              height: screenHeight * 0.24,
+              child: Consumer<AuthProvider>(builder: (context, auth, child) {
+                final userData = auth.userData;
+                return Column(
+                  children: [
+                    TextContainerProfile(
+                      title: 'Nama',
+                      field: userData?['name'] ?? 'guest',
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    TextContainerProfile(
+                      title: 'Username',
+                      field: userData?['username'] ?? 'guest',
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    TextContainerProfile(
+                      title: 'No Telepon',
+                      field: userData?['user_phone'] ?? 'guest',
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    TextContainerProfile(
+                      title: 'Status Pengguna',
+                      field: 'Membership',
+                    ),
+                  ],
+                );
+              })),
           CustomButton1(
             buttonHeight: 0.06,
             buttonWidth: 0.7,
@@ -69,7 +73,16 @@ class ProfilePage extends StatelessWidget {
             buttonHeight: 0.06,
             buttonWidth: 0.7,
             title: 'Logout',
-            onPressed: () {},
+            onPressed: () async {
+              try {
+                await authProvider.logout();
+              } catch (error) {
+                // Tampilkan pesan kesalahan jika diperlukan
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Logout gagal: $error')),
+                );
+              }
+            },
             backgroundColor: Colors.red,
             colorText: Colors.white,
           ),

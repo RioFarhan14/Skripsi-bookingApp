@@ -1,5 +1,8 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:user_frontend/providers/authProvider.dart';
 import 'package:user_frontend/screens/activity/main.dart';
 import 'package:user_frontend/screens/home.dart';
 import 'package:user_frontend/screens/profile/main.dart';
@@ -20,6 +23,7 @@ class MenuNavigation extends StatefulWidget {
 
 class _MenuNavigationState extends State<MenuNavigation> {
   int currentIndex = 0;
+  String? _token; // Simpan token di sini
 
   @override
   void initState() {
@@ -32,17 +36,25 @@ class _MenuNavigationState extends State<MenuNavigation> {
     List<Widget> bodyWidget = [
       const HomePage(),
       const ActivityPage(),
-      const ProfilePage()
+      const ProfilePage(),
     ];
 
     List<Widget> appWidget = [
-      AppBarHome(
-        title: 'Selamat Datang,',
-        subtitle: 'Rio Farhan',
-        onNotificationPressed: () {
-          Navigator.pushNamed(context, '/information');
-        },
-      ),
+      Consumer<AuthProvider>(builder: (context, auth, child) {
+        final userData = auth.userData;
+        if (userData == null || userData['name'] == null) {
+          return Center(
+              child: CircularProgressIndicator()); // Menampilkan loading
+        }
+
+        return AppBarHome(
+          title: 'Selamat Datang,',
+          subtitle: userData['name'],
+          onNotificationPressed: () {
+            Navigator.pushNamed(context, '/information');
+          },
+        );
+      }),
       const AppBarActivity(title: 'Aktivitas'),
       const AppBarProfile(title: 'Profil'),
     ];

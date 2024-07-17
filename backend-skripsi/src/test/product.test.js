@@ -1,5 +1,6 @@
 import supertest from "supertest";
 import { web } from "../application/web.js";
+import path from "path"; // Impor path
 import {
   createProductField,
   createProductMembership,
@@ -28,13 +29,12 @@ describe("POST /api/users/products", function () {
     const result = await supertest(web)
       .post("/api/users/products")
       .set("Authorization", "admin")
-      .send({
-        product_name: "Lapangan A",
-        product_type: "field",
-        price: 100000,
-        image_url: "www.product.id",
-        description: "product details",
-      });
+      .field("product_name", "Lapangan A")
+      .field("product_type", "field")
+      .field("price", 100000)
+      .field("description", "product details")
+      .attach("image", "C:/Users/Rio Farhan Avito/Downloads/digital.png"); // Ganti dengan path ke file yang ingin diupload
+
     expect(result.status).toBe(200);
     expect(result.body.data.product_name).toBe("Lapangan A");
     expect(result.body.data.product_type).toBe("field");
@@ -102,11 +102,9 @@ describe("GET /api/users/products", function () {
 
   it("should get product by id", async () => {
     const result = await supertest(web)
-      .get("/api/users/products")
-      .set("Authorization", "test")
-      .send({
-        product_id: 1,
-      });
+      .get("/api/users/products?product_id=1")
+      .set("Authorization", "test");
+
     logger.info(result.body);
     expect(result.status).toBe(200);
     expect(result.body.data).toBeDefined();

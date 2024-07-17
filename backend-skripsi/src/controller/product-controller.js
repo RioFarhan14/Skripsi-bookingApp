@@ -4,7 +4,9 @@ const create = async (req, res, next) => {
   try {
     const user_id = req.user.user_id;
     const request = req.body;
+    const image = req.filePath;
     request.user_id = user_id;
+    request.image_url = image;
     const result = await productService.create(request);
     res.status(200).json({
       data: result,

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:user_frontend/providers/authProvider.dart';
 import 'package:user_frontend/utils/customAppBar.dart';
 import 'package:user_frontend/utils/customBotton1.dart';
 import 'package:user_frontend/utils/customTextField1.dart';
 import 'package:user_frontend/utils/theme.dart';
+import 'package:user_frontend/widgets/textButtonProfile.dart';
 
 class EditProfilePage extends StatelessWidget {
   const EditProfilePage({Key? key});
@@ -11,6 +15,7 @@ class EditProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sizeHeight = MediaQuery.of(context).size.height;
+    final data = Provider.of<AuthProvider>(context).userData;
     return Scaffold(
       resizeToAvoidBottomInset:
           false, // Menghindari perubahan tata letak saat keyboard muncul
@@ -47,14 +52,12 @@ class EditProfilePage extends StatelessWidget {
                               fontSize: screenHeight * 0.024),
                         ),
                         SizedBox(width: screenWidth * 0.05),
-                        SizedBox(
-                            width: screenWidth *
-                                0.6, // Sesuaikan dengan lebar yang diinginkan
-                            child: const CustomTextField1(
-                              keyboardType: TextInputType.name,
-                              fieldHeight: 0.07,
-                              fieldWidth: 0.7,
-                            )),
+                        TextButtonProfile(
+                            name: data!['name'],
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/form',
+                                  arguments: 'name');
+                            })
                       ],
                     ),
                     SizedBox(
@@ -69,14 +72,12 @@ class EditProfilePage extends StatelessWidget {
                               fontSize: screenHeight * 0.024),
                         ),
                         SizedBox(width: screenWidth * 0.05),
-                        SizedBox(
-                            width: screenWidth *
-                                0.6, // Sesuaikan dengan lebar yang diinginkan
-                            child: const CustomTextField1(
-                              keyboardType: TextInputType.name,
-                              fieldHeight: 0.07,
-                              fieldWidth: 0.7,
-                            )),
+                        TextButtonProfile(
+                            name: data['username'],
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/form',
+                                  arguments: 'username');
+                            })
                       ],
                     ),
                     SizedBox(
@@ -91,43 +92,28 @@ class EditProfilePage extends StatelessWidget {
                               fontSize: screenHeight * 0.024),
                         ),
                         SizedBox(width: screenWidth * 0.05),
-                        SizedBox(
-                            width: screenWidth *
-                                0.6, // Sesuaikan dengan lebar yang diinginkan
-                            child: const CustomTextField1(
-                              keyboardType: TextInputType.phone,
-                              fieldHeight: 0.07,
-                              fieldWidth: 0.7,
-                            )),
+                        TextButtonProfile(
+                            name: data['user_phone'],
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/form',
+                                  arguments: 'user_phone');
+                            })
                       ],
                     ),
                     SizedBox(
                       height: screenHeight * 0.02,
-                    ),
-                    Text(
-                      'Konfirmasi Password',
-                      style: GoogleFonts.poppins(fontSize: screenHeight * 0.04),
-                    ),
-                    SizedBox(
-                      height: screenHeight * 0.02,
-                    ),
-                    const CustomTextField1(
-                      fieldHeight: 0.07,
-                      fieldWidth: 0.7,
-                      obscureText: true,
-                      keyboardType: TextInputType.visiblePassword,
                     ),
                     SizedBox(
                       height: screenHeight * 0.02,
                     ),
                     CustomButton1(
                         buttonHeight: 0.07,
-                        buttonWidth: 0.35,
-                        title: 'Simpan',
+                        buttonWidth: 0.6,
+                        title: 'Ganti Password',
                         // Within the `FirstRoute` widget
                         onPressed: () {
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, '/home', (route) => false);
+                          Navigator.pushNamed(context, '/form',
+                              arguments: 'password');
                         },
                         backgroundColor: orangeColor,
                         colorText: Colors.white)

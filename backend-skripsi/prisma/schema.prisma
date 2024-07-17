@@ -58,9 +58,9 @@ model Booking {
   user_id String @db.VarChar(11)
   product_id Int
   status status_booking
-  booking_date DateTime @db.Date
-  start_time DateTime @db.Time()
-  end_time DateTime @db.Time()
+  booking_date String @db.VarChar(10)
+  start_time String @db.VarChar(5)
+  end_time String @db.VarChar(5)
   user User @relation(fields: [user_id], references: [user_id])
   product Product @relation(fields: [product_id], references: [product_id])
   @@map("bookings")
@@ -70,7 +70,9 @@ model Transaction {
   transaction_id String @id @db.VarChar(12)
   user_id String
   transaction_date DateTime
-  metode_pembayaran MetodePembayaran // Menggunakan tipe data yang lebih spesifik untuk metode pembayaran
+  payment String? @db.VarChar(20)
+  snap_token String? @db.VarChar(255)
+  snap_redirect_url String? @db.VarChar(255)
   status status_transaction
   discount Int?
   total_amount Int
@@ -81,7 +83,7 @@ model Transaction {
 
 model Transaction_detail {
   transaction_detail_id Int @id @default(autoincrement())
-  transaction_id String
+  transaction_id String @db.VarChar(12)
   product_id Int
   quantity Int
   unit_price Int
@@ -97,9 +99,9 @@ model Help {
 }
 
 enum status_transaction {
-  paid
-  pending
-  failed
+  PAID
+  PENDING
+  CANCELLED
 }
 
 enum status_notification {
@@ -109,10 +111,10 @@ enum status_notification {
 
 enum status_booking {
   Ongoing
-  booked
-  pending
-  cancelled
-  completed
+  Booked
+  Pending
+  Cancelled
+  Completed
 }
 
 enum product_type {
@@ -123,11 +125,4 @@ enum product_type {
 enum Role {
   admin
   user
-}
-
-enum MetodePembayaran {
-  gopay
-  mandiri
-  bca
-  shopeePay
 }

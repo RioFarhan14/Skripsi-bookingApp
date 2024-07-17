@@ -90,13 +90,11 @@ Response Body Error :
 }
 ```
 
-<!--
 ## Create Booking API
 
 Headers :
 
 - Authorization : token
-- role : admin
 
 Endpoint : POST /api/users/booking
 
@@ -104,12 +102,21 @@ Request Body :
 
 ```json
 {
+  "user_id": "00000000000", // di butuhkan jika role admin
   "product_id": "01",
   "booking_date": "2024-04-04",
   "start-time": "18:00",
   "duration": "1"
 }
-``` -->
+```
+
+Response Body success :
+
+```json
+{
+  "data": "Berhasil ditambahkan"
+}
+```
 
 ## Update Booking API
 
@@ -125,6 +132,7 @@ Request Body :
 ```json
 {
   "booking_id": "01",
+  "product_id": "01", //optional
   "booking_date": "2024-05-05", //Optional
   "start-time": "19:00" // Optional
 }
@@ -134,14 +142,7 @@ Response Body Success :
 
 ```json
 {
-  "data": {
-    "product_id": "01",
-    "product_name": "Lapangan A",
-    "status": "DiPesan",
-    "booking_date": "2024-05-05",
-    "start-time": "19:00",
-    "end_time": "21:00"
-  }
+  "data": "Berhasil diubah"
 }
 ```
 
@@ -164,5 +165,5 @@ Headers:
 Request Body:
 
 ```json
-{ "booking_id": "01" }
+{ "data": "Berhasil dihapus" }
 ```

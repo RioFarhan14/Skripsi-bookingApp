@@ -12,4 +12,14 @@ class Field {
     required this.image,
     required this.description,
   });
+
+  factory Field.fromJson(Map<String, dynamic> json) {
+    return Field(
+      id: json['product_id'],
+      name: json['product_name'],
+      price: json['price'],
+      image: json['image_url'],
+      description: json['description'],
+    );
+  }
 }
