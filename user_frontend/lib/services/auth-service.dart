@@ -43,26 +43,10 @@ class AuthService {
   }
 
   Future<Map<String, dynamic>> updateUserData(
-    String token,
-    Map<String, dynamic> updatedData, {
-    String? username,
-    String? password,
-    String? confirmPassword,
-    String? name,
-    String? userPhone,
-  }) async {
-    final Map<String, dynamic> body = {};
-
-    // Hanya tambahkan data yang tidak null ke dalam body
-    if (username != null) body['username'] = username;
-    if (password != null) body['password'] = password;
-    if (confirmPassword != null) body['confirm_password'] = confirmPassword;
-    if (name != null) body['name'] = name;
-    if (userPhone != null) body['user_phone'] = userPhone;
-
+      String token, Map<String, dynamic> updatedData) async {
     final response = await http.patch(
-      Uri.parse('$baseUrl/api/users'),
-      body: json.encode(body),
+      Uri.parse('$baseUrl/api/users/current'),
+      body: json.encode(updatedData),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': token, // Mengirim token untuk autentikasi
@@ -73,6 +57,8 @@ class AuthService {
       return json.decode(response.body);
     } else {
       final errorResponse = json.decode(response.body);
+      print(
+          'Error response: ${response.body}'); // Tambahkan ini untuk debugging
       throw Exception(errorResponse['errors'] ?? 'Update failed');
     }
   }

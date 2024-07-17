@@ -13,6 +13,7 @@ class AppBarProfile extends StatelessWidget {
   Widget build(BuildContext context) {
     final sizeHeight = MediaQuery.of(context).size.height;
     return AppBar(
+      automaticallyImplyLeading: false,
       toolbarHeight: sizeHeight,
       title: Text(
         title,

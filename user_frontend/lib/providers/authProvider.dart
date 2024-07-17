@@ -48,6 +48,9 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> logout() async {
+    if (_token != null) {
+      await _authService.logout(_token!);
+    }
     _token = null;
     _userData = null; // Hapus data pengguna saat logout
     final prefs = await SharedPreferences.getInstance();

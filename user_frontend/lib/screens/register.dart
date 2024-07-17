@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:user_frontend/providers/authProvider.dart';
+import 'package:user_frontend/utils/alert.dart';
 import 'package:user_frontend/utils/customBotton1.dart';
 import 'package:user_frontend/utils/customTextField1.dart';
 import 'package:user_frontend/utils/theme.dart';
@@ -113,22 +114,35 @@ class RegisterPage extends StatelessWidget {
                 CustomButton1(
                   title: 'Daftar',
                   onPressed: () async {
-                    try {
-                      await authProvider.register(
-                        usernameController.text,
-                        passwordController.text,
-                        confirmPasswordController.text,
-                        nameController.text,
-                        phoneController.text,
-                      );
-                      Navigator.pushNamed(context, '/login');
-                    } catch (error) {
-                      // Handle registration error
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Registration failed: $error'),
-                        ),
-                      );
+                    if (usernameController.text.isNotEmpty &&
+                        passwordController.text.isNotEmpty &&
+                        confirmPasswordController.text.isNotEmpty &&
+                        nameController.text.isNotEmpty &&
+                        phoneController.text.isNotEmpty) {
+                      try {
+                        await authProvider.register(
+                          usernameController.text,
+                          passwordController.text,
+                          confirmPasswordController.text,
+                          nameController.text,
+                          phoneController.text,
+                        );
+                        Navigator.pushNamed(context, '/login');
+                        ScaffoldMessenger.of(context)
+                            .showSnackBar(const SnackBar(
+                          content: Text('Registrasi Berhasil!'),
+                          backgroundColor: Colors.green,
+                        ));
+                      } catch (error) {
+                        // Handle registration error
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Registrasi gagal: $error'),
+                          backgroundColor: Colors.red,
+                        ));
+                      }
+                    } else {
+                      showErrorDialog(
+                          context, 'Peringatan', 'Semua field harus diisi.');
                     }
                   },
                   backgroundColor: orangeColor,

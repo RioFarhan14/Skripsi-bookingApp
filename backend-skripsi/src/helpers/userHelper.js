@@ -1,6 +1,6 @@
 import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
-
+import bcrypt from "bcrypt";
 const generateUserId = async (role) => {
   const lastUser = await prismaClient.user.findFirst({
     orderBy: {

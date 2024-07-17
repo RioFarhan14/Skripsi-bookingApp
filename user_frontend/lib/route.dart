@@ -52,7 +52,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           builder: (_) => AuthGuard(child: MenuNavigation(initialIndex: 2)));
     case '/form':
       return MaterialPageRoute(
-          builder: (context) => AuthGuard(child: FormEditProfile()));
+          builder: (context) => AuthGuard(child: FormEditProfile()),
+          settings: settings);
     case '/information':
       return MaterialPageRoute(
           builder: (_) => AuthGuard(child: InformationPage()));
@@ -61,7 +62,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
           builder: (_) => AuthGuard(child: BookingFieldPage()));
     case '/detailBook':
       return MaterialPageRoute(
-          builder: (_) => AuthGuard(child: DetailBookingPage()));
+          builder: (_) => AuthGuard(child: DetailBookingPage()),
+          settings: settings);
     case '/checkout':
       return MaterialPageRoute(
           builder: (_) => AuthGuard(child: CheckoutPage()));

@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:user_frontend/providers/authProvider.dart';
+import 'package:user_frontend/utils/alert.dart';
 import 'package:user_frontend/utils/customBotton1.dart';
 import 'package:user_frontend/utils/customTextField1.dart';
 import 'package:user_frontend/utils/theme.dart';
@@ -62,20 +63,24 @@ class LoginPage extends StatelessWidget {
               CustomButton1(
                 title: 'Masuk',
                 onPressed: () async {
-                  try {
-                    await authProvider.login(
-                      usernameController.text,
-                      passwordController.text,
-                    );
-                    Navigator.pushNamed(context, '/home');
-                  } catch (error) {
-                    // Handle login error
-                    print(error);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Login failed: $error'),
-                      ),
-                    );
+                  if (usernameController.text.isNotEmpty &&
+                      passwordController.text.isNotEmpty) {
+                    try {
+                      await authProvider.login(
+                        usernameController.text,
+                        passwordController.text,
+                      );
+                      Navigator.pushNamed(context, '/home');
+                    } catch (error) {
+                      // Handle login error
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Login gagal: $error'),
+                        backgroundColor: Colors.red,
+                      ));
+                    }
+                  } else {
+                    showErrorDialog(
+                        context, 'Peringatan', 'Semua field harus diisi.');
                   }
                 },
                 backgroundColor: orangeColor,

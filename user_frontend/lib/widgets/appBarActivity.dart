@@ -14,6 +14,7 @@ class AppBarActivity extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final sizeHeight = MediaQuery.of(context).size.height;
     return AppBar(
+      automaticallyImplyLeading: false,
       toolbarHeight: sizeHeight * 0.1,
       backgroundColor: darkBlueColor,
       title: Text(

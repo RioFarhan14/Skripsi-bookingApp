@@ -4,7 +4,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:user_frontend/models/field.dart';
-import 'package:user_frontend/providers/fieldProvider.dart';
+import 'package:user_frontend/providers/productProvider.dart';
+import 'package:user_frontend/utils/alert.dart';
+import 'package:user_frontend/utils/constants.dart';
 import 'package:user_frontend/utils/customBotton1.dart';
 import 'package:user_frontend/utils/customTextField1.dart';
 import 'package:user_frontend/utils/theme.dart';
@@ -36,7 +38,7 @@ class _DetailBookingPageState extends State<DetailBookingPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     fieldId = ModalRoute.of(context)!.settings.arguments as int;
-    field = Provider.of<FieldProvider>(context, listen: false)
+    field = Provider.of<ProductProvider>(context, listen: false)
         .fields
         .firstWhere((field) => field.id == fieldId);
   }
@@ -53,13 +55,13 @@ class _DetailBookingPageState extends State<DetailBookingPage> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
+    final imageUrl = '$BASE_URL/images/${field.image}';
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
           children: [
             Image.network(
-              field.image,
+              imageUrl,
               width: screenWidth,
               height: screenHeight * 0.4,
               fit: BoxFit.cover,
@@ -200,9 +202,12 @@ class _DetailBookingPageState extends State<DetailBookingPage> {
                           'quantity': textDuration.text,
                           'booking': true
                         });
+                      } else {
+                        showErrorDialog(
+                            context, 'Peringatan', 'Semua field harus diisi.');
                       }
                     },
-                    backgroundColor: Colors.green,
+                    backgroundColor: orangeColor,
                     colorText: Colors.white,
                     buttonWidth: 0.9,
                     buttonHeight: 0.06,

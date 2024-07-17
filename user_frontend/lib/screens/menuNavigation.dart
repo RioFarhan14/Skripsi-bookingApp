@@ -55,7 +55,9 @@ class _MenuNavigationState extends State<MenuNavigation> {
           },
         );
       }),
-      const AppBarActivity(title: 'Aktivitas'),
+      const AppBarActivity(
+        title: 'Aktivitas',
+      ),
       const AppBarProfile(title: 'Profil'),
     ];
 
