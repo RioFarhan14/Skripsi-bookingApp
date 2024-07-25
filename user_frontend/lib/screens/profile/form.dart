@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:user_frontend/providers/authProvider.dart';
 import 'package:user_frontend/utils/alert.dart';
@@ -90,7 +89,7 @@ class FormEditProfile extends StatelessWidget {
 
                         if (argument != null && data.text.isNotEmpty) {
                           final updateData = {
-                            argument!: data.text
+                            argument: data.text
                           }; // Pastikan argument tidak null
 
                           final Response =

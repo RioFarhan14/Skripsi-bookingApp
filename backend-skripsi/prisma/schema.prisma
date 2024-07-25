@@ -16,7 +16,6 @@ model User {
   role Role
   token String? @db.VarChar(100)
   memberships Membership[]
-  notifications Notification[]
   bookings Booking[]
   transactions Transaction[]
   @@map("users")
@@ -43,15 +42,6 @@ model Membership {
   @@map("memberships")
 }
 
-model Notification {
-  notification_id String @id @db.VarChar(8)
-  user_id String @db.VarChar(11)
-  message String @db.VarChar(225)
-  notification_date DateTime
-  status status_notification
-  user User @relation(fields: [user_id], references: [user_id])
-  @@map("notifications")
-}
 
 model Booking {
   booking_id String @id @db.VarChar(12)
@@ -61,6 +51,7 @@ model Booking {
   booking_date String @db.VarChar(10)
   start_time String @db.VarChar(5)
   end_time String @db.VarChar(5)
+  transaction Transaction? 
   user User @relation(fields: [user_id], references: [user_id])
   product Product @relation(fields: [product_id], references: [product_id])
   @@map("bookings")
@@ -69,6 +60,7 @@ model Booking {
 model Transaction {
   transaction_id String @id @db.VarChar(12)
   user_id String
+  booking_id String? @unique
   transaction_date DateTime
   payment String? @db.VarChar(20)
   snap_token String? @db.VarChar(255)
@@ -77,9 +69,13 @@ model Transaction {
   discount Int?
   total_amount Int
   transaction_details Transaction_detail[]
-  user User @relation(fields: [user_id], references: [user_id])  // Menambahkan constraint di user_id
+  user User @relation(fields: [user_id], references: [user_id])
+  booking Booking? @relation(fields: [booking_id], references: [booking_id]) // Mendefinisikan relasi satu arah
   @@map("transactions")
 }
+
+
+
 
 model Transaction_detail {
   transaction_detail_id Int @id @default(autoincrement())
@@ -102,11 +98,6 @@ enum status_transaction {
   PAID
   PENDING
   CANCELLED
-}
-
-enum status_notification {
-  read
-  unread
 }
 
 enum status_booking {

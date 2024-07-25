@@ -10,4 +10,13 @@ class Membership {
     required this.price,
     required this.image,
   });
+
+  factory Membership.fromJson(Map<String, dynamic> json) {
+    return Membership(
+      id: json['product_id'],
+      name: json['product_name'],
+      price: json['price'],
+      image: json['image_url'],
+    );
+  }
 }

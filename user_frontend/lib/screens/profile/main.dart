@@ -7,7 +7,7 @@ import 'package:user_frontend/utils/theme.dart';
 import 'package:user_frontend/widgets/textProfile.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key});
+  const ProfilePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,9 @@ class ProfilePage extends StatelessWidget {
                     SizedBox(height: screenHeight * 0.02),
                     TextContainerProfile(
                       title: 'Status Pengguna',
-                      field: 'Membership',
+                      field: userData?['isMember'] == true
+                          ? 'Membership'
+                          : 'Guest',
                     ),
                   ],
                 );

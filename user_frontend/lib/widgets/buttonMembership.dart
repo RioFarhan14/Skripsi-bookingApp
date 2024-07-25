@@ -35,7 +35,7 @@ class ButtonMembership extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   label: Padding(
-                    padding: EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

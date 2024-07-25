@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:user_frontend/models/booking.dart';
+import 'package:user_frontend/models/field.dart';
 import 'package:user_frontend/providers/bookingProvider.dart';
+import 'package:user_frontend/providers/productProvider.dart';
 import 'package:user_frontend/utils/customAppBar.dart';
 import 'package:user_frontend/utils/customBotton1.dart';
 import 'package:user_frontend/utils/customTextField1.dart';
@@ -16,23 +20,42 @@ class ChangeSchedule extends StatefulWidget {
 }
 
 class _ChangeScheduleState extends State<ChangeSchedule> {
-  late DateTime selectedDate;
-  late TimeOfDay selectedTime;
+  Field? product; // Tipe opsional
+  BookingItem? booking; // Tipe opsional
+  late String selectedDate;
+  late String selectedTime;
   bool isInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final bookingId = ModalRoute.of(context)!.settings.arguments as int;
-      final booking = Provider.of<BookingProvider>(context, listen: false)
-          .bookings
-          .firstWhere((booking) => booking.id == bookingId);
-      setState(() {
-        selectedDate = booking.schedule;
-        selectedTime = booking.clock;
-        isInitialized = true;
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await Provider.of<BookingProvider>(context, listen: false)
+            .fetchUserBookings();
+        final bookingId = ModalRoute.of(context)!.settings.arguments as String;
+        booking = await Provider.of<BookingProvider>(context, listen: false)
+            .getUserBookingById(bookingId);
+
+        final fields =
+            Provider.of<ProductProvider>(context, listen: false).fields;
+        // Periksa jika product ditemukan
+        product = fields.firstWhere(
+          (field) => field.id == booking!.product_id,
+          orElse: () => throw Exception(
+              'Field not found'), // Menangani kasus item tidak ditemukan
+        );
+
+        setState(() {
+          if (booking != null) {
+            selectedDate = booking!.schedule;
+            selectedTime = booking!.start_time;
+            isInitialized = true;
+          }
+        });
+      } catch (e) {
+        print("Error: $e");
+      }
     });
   }
 
@@ -40,14 +63,14 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
-    if (!isInitialized) {
+    if (!isInitialized || product == null || booking == null) {
       return Scaffold(
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(screenHeight * 0.1),
+          preferredSize:
+              Size.fromHeight(MediaQuery.of(context).size.height * 0.1),
           child: const CustomAppBar(title: 'Ubah Jadwal'),
         ),
-        body: Center(
+        body: const Center(
           child: CircularProgressIndicator(),
         ),
       );
@@ -97,7 +120,7 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                   ),
                   SizedBox(height: screenHeight * 0.003),
                   Text(
-                    'Lapangan A',
+                    product!.name,
                     style: GoogleFonts.poppins(
                         color: whiteColor, fontSize: screenWidth * 0.045),
                   ),
@@ -115,7 +138,7 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                           ),
                           SizedBox(width: screenWidth * 0.02),
                           Text(
-                            '${selectedDate.day}-${selectedDate.month}-${selectedDate.year}',
+                            selectedDate,
                             style: GoogleFonts.poppins(
                                 color: whiteColor,
                                 fontSize: screenWidth * 0.04),
@@ -134,7 +157,7 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                             ),
                             SizedBox(width: screenWidth * 0.02),
                             Text(
-                              '${selectedTime.hour}:${selectedTime.minute.toString().padLeft(2, '0')}',
+                              selectedTime,
                               style: GoogleFonts.poppins(
                                   color: whiteColor,
                                   fontSize: screenWidth * 0.04),
@@ -157,8 +180,7 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                             color: orangeColor, FontAwesomeIcons.calendar),
                         enabled: false,
                         controller: TextEditingController(
-                          text:
-                              '${selectedDate.day.toString().padLeft(2, '0')}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.year}',
+                          text: selectedDate,
                         ),
                       ),
                       SizedBox(width: screenWidth * 0.03),
@@ -187,8 +209,7 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                             FaIcon(color: orangeColor, FontAwesomeIcons.clock),
                         enabled: false,
                         controller: TextEditingController(
-                          text:
-                              '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}',
+                          text: selectedTime,
                         ),
                       ),
                       SizedBox(width: screenWidth * 0.03),
@@ -207,9 +228,42 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
                   SizedBox(height: screenHeight * 0.07),
                   CustomButton1(
                     title: 'Konfirmasi',
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/activity', (route) => false);
+                    onPressed: () async {
+                      // Ambil data yang perlu diperbarui, ini adalah contoh
+                      final updatedData = {
+                        'booking_id': booking
+                            ?.id, // Asumsikan Anda memiliki `booking` yang sudah diambil sebelumnya
+                        'booking_date': selectedDate,
+                        'start_time': selectedTime,
+                        // Tambahkan data lain yang diperlukan untuk update
+                      };
+
+                      // Ambil `BookingProvider` dari context
+                      final bookingProvider =
+                          Provider.of<BookingProvider>(context, listen: false);
+
+                      try {
+                        // Panggil metode updateBookingUser untuk memperbarui data booking
+                        await bookingProvider.updateBookingUser(updatedData);
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            behavior: SnackBarBehavior.floating,
+                            content: Text('Berhasil memperbarui booking'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                        // Navigasi setelah pembaruan berhasil
+                        Navigator.pop(context);
+                      } catch (e) {
+                        // Tangani error jika pembaruan gagal
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Gagal memperbarui booking: $e'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     },
                     backgroundColor: orangeColor,
                     colorText: Colors.white,
@@ -228,10 +282,15 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
   void _selectDate(BuildContext context) async {
     try {
       final currentDate = DateTime.now();
-      final newInitialDate = selectedDate.isBefore(currentDate) ||
-              selectedDate.isAfter(currentDate.add(const Duration(days: 7)))
+      final newInitialDate = selectedDate.isEmpty ||
+              DateFormat('yyyy-MM-dd')
+                  .parse(selectedDate)
+                  .isBefore(currentDate) ||
+              DateFormat('yyyy-MM-dd')
+                  .parse(selectedDate)
+                  .isAfter(currentDate.add(const Duration(days: 7)))
           ? currentDate
-          : selectedDate;
+          : DateFormat('yyyy-MM-dd').parse(selectedDate);
 
       final newDate = await showDatePicker(
         context: context,
@@ -242,7 +301,8 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
 
       if (newDate != null) {
         setState(() {
-          selectedDate = newDate;
+          selectedDate = DateFormat('yyyy-MM-dd')
+              .format(newDate); // Update tanggal dengan format string
         });
       }
     } catch (error) {
@@ -253,7 +313,8 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
   void _selectTime(BuildContext context) async {
     final newTime = await showTimePicker(
         context: context,
-        initialTime: selectedTime,
+        initialTime:
+            TimeOfDay.fromDateTime(DateFormat('HH:mm').parse(selectedTime)),
         builder: (BuildContext context, Widget? child) {
           return MediaQuery(
               data:
@@ -263,7 +324,7 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
 
     if (newTime != null) {
       setState(() {
-        selectedTime = newTime;
+        selectedTime = newTime.format(context); // Format waktu ke string
       });
     }
   }

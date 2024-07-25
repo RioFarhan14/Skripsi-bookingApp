@@ -23,7 +23,7 @@ class AuthProvider with ChangeNotifier {
       await prefs.setString('token', _token!);
       notifyListeners();
     } catch (error) {
-      throw error;
+      rethrow;
     }
   }
 
@@ -34,7 +34,7 @@ class AuthProvider with ChangeNotifier {
           username, password, confirmPassword, name, userPhone);
       await login(username, password);
     } catch (error) {
-      throw error;
+      rethrow;
     }
   }
 
@@ -65,7 +65,7 @@ class AuthProvider with ChangeNotifier {
       _userData = response['data'];
       notifyListeners();
     } catch (error) {
-      throw error;
+      rethrow;
     }
   }
 
@@ -80,7 +80,7 @@ class AuthProvider with ChangeNotifier {
       };
       notifyListeners();
     } catch (error) {
-      throw error; // Tangani kesalahan update
+      rethrow; // Tangani kesalahan update
     }
   }
 

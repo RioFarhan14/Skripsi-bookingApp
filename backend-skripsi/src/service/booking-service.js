@@ -15,6 +15,7 @@ import { validateMembership, validateUser } from "../utils/validate.js";
 import {
   calculateEndTime,
   generateBookingId,
+  isValidBooking,
   validateBookingId,
   validateLimitTime,
   validateSchedule,
@@ -43,11 +44,13 @@ const getBookingByProductAndDate = async (request) => {
     where: {
       product_id: user.product_id,
       booking_date: user.booking_date,
-      status: "Booked",
+      OR: [{ status: "Booked" }, { status: "Ongoing" }],
     },
     select: {
       booking_id: true,
+      product_id: true,
       booking_date: true,
+      status: true,
       start_time: true,
       end_time: true,
       user: {
@@ -57,17 +60,6 @@ const getBookingByProductAndDate = async (request) => {
       },
     },
   });
-  return result;
-};
-
-const getBookingById = async (request) => {
-  const user = validate(getBookingByIdValidation, request);
-
-  await validateUser(user.user_id);
-
-  const set = { booking_id: user.booking_id };
-  const result = await validateBookingId(set);
-
   return result;
 };
 
@@ -83,8 +75,16 @@ const getUserBooking = async (user_id) => {
     },
     select: {
       booking_id: true,
+      product_id: true,
+      transaction: {
+        select: {
+          snap_token: true,
+        },
+      },
       status: true,
+      booking_date: true,
       start_time: true,
+      end_time: true,
     },
   });
 };
@@ -94,6 +94,13 @@ const createBooking = async (request) => {
   const checkUserInDatabase = await validateUser(data.user_id_token);
 
   const status = "Pending";
+
+  if (isValidBooking(data.booking_date, data.start_time) == false) {
+    throw new ResponseError(
+      400,
+      "Tanggal dan waktu booking tidak boleh kurang dari waktu saat ini."
+    );
+  }
 
   data.end_time = calculateEndTime(data.start_time, data.duration);
 
@@ -108,6 +115,8 @@ const createBooking = async (request) => {
       "waktu harus lebih dari 09:00 dan kurang dari 22:00"
     );
   }
+
+  const timeNow = getCurrentTime();
 
   // Cek jadwal yang bertabrakan
   await validateSchedule(data);
@@ -135,6 +144,7 @@ const createBooking = async (request) => {
     });
 
     const result = {};
+    result.booking_id = data.booking_id;
     result.user_id_token = data.user_id_token;
     result.product_id = data.product_id;
     result.quantity = data.duration;
@@ -165,6 +175,7 @@ const createBooking = async (request) => {
   });
 
   const result = {};
+  result.booking_id = data.booking_id;
   result.user_id_token = data.user_id_token;
   result.user_id = data.user_id;
   result.product_id = data.product_id;
@@ -247,7 +258,6 @@ const deleteBooking = async (request) => {
 };
 export default {
   getAllBooking,
-  getBookingById,
   getBookingByProductAndDate,
   getUserBooking,
   createBooking,

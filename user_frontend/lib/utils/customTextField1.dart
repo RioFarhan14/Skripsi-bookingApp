@@ -52,7 +52,7 @@ class CustomTextField1 extends StatelessWidget {
           topLeft: Radius.circular(screenHeight * 0.015),
           bottomRight: Radius.circular(screenHeight * 0.015),
         ),
-        color: backgroundColor ?? null,
+        color: backgroundColor,
       ),
       child: TextField(
         controller: controller,

@@ -20,13 +20,13 @@ import 'package:user_frontend/screens/viewSchedule/main.dart';
 class AuthGuard extends StatelessWidget {
   final Widget child;
 
-  const AuthGuard({required this.child});
+  const AuthGuard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
     if (!auth.isAuthenticated) {
-      return LoginPage();
+      return const LoginPage();
     }
     return child;
   }
@@ -36,51 +36,58 @@ class AuthGuard extends StatelessWidget {
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
     case '/splashScreen':
-      return MaterialPageRoute(builder: (_) => SplashScreen());
+      return MaterialPageRoute(builder: (_) => const SplashScreen());
     case '/login':
-      return MaterialPageRoute(builder: (_) => LoginPage());
+      return MaterialPageRoute(builder: (_) => const LoginPage());
     case '/register':
-      return MaterialPageRoute(builder: (_) => RegisterPage());
+      return MaterialPageRoute(builder: (_) => const RegisterPage());
     case '/home':
       return MaterialPageRoute(
-          builder: (_) => AuthGuard(child: MenuNavigation(initialIndex: 0)));
+          builder: (_) =>
+              const AuthGuard(child: MenuNavigation(initialIndex: 0)));
     case '/activity':
       return MaterialPageRoute(
-          builder: (_) => AuthGuard(child: MenuNavigation(initialIndex: 1)));
+          builder: (_) =>
+              const AuthGuard(child: MenuNavigation(initialIndex: 1)));
     case '/profile':
       return MaterialPageRoute(
-          builder: (_) => AuthGuard(child: MenuNavigation(initialIndex: 2)));
+          builder: (_) =>
+              const AuthGuard(child: MenuNavigation(initialIndex: 2)));
     case '/form':
       return MaterialPageRoute(
-          builder: (context) => AuthGuard(child: FormEditProfile()),
+          builder: (context) => const AuthGuard(child: FormEditProfile()),
           settings: settings);
     case '/information':
       return MaterialPageRoute(
-          builder: (_) => AuthGuard(child: InformationPage()));
+          builder: (_) => const AuthGuard(child: InformationPage()));
     case '/booking':
       return MaterialPageRoute(
-          builder: (_) => AuthGuard(child: BookingFieldPage()));
+          builder: (_) => const AuthGuard(child: BookingFieldPage()));
     case '/detailBook':
       return MaterialPageRoute(
-          builder: (_) => AuthGuard(child: DetailBookingPage()),
+          builder: (_) => const AuthGuard(child: DetailBookingPage()),
           settings: settings);
     case '/checkout':
       return MaterialPageRoute(
-          builder: (_) => AuthGuard(child: CheckoutPage()));
+          builder: (_) => const AuthGuard(child: CheckoutPage()),
+          settings: settings);
     case '/help':
-      return MaterialPageRoute(builder: (_) => AuthGuard(child: HelpPage()));
+      return MaterialPageRoute(
+          builder: (_) => const AuthGuard(child: HelpPage()));
     case '/viewSchedule':
       return MaterialPageRoute(
-          builder: (_) => AuthGuard(child: ViewSchedulePage()));
+          builder: (_) => const AuthGuard(child: ViewSchedulePage()));
     case '/aboutMe':
-      return MaterialPageRoute(builder: (_) => AuthGuard(child: AboutMe()));
+      return MaterialPageRoute(
+          builder: (_) => const AuthGuard(child: AboutMe()));
     case '/membership':
       return MaterialPageRoute(
-          builder: (_) => AuthGuard(child: MembershipPage()));
+          builder: (_) => const AuthGuard(child: MembershipPage()));
     case '/changeSchedule':
       return MaterialPageRoute(
-          builder: (_) => AuthGuard(child: ChangeSchedule()));
+          builder: (_) => const AuthGuard(child: ChangeSchedule()),
+          settings: settings);
     default:
-      return MaterialPageRoute(builder: (_) => LoginPage());
+      return MaterialPageRoute(builder: (_) => const LoginPage());
   }
 }

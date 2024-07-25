@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:user_frontend/providers/productProvider.dart';
 import 'package:user_frontend/utils/theme.dart';
-import 'package:user_frontend/providers/membershipProvider.dart';
 import 'package:user_frontend/models/membership.dart';
 
 class MembershipPage extends StatefulWidget {
@@ -16,12 +16,48 @@ class _MembershipPageState extends State<MembershipPage> {
   String _membershipType = '1'; // State variable for radio button
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<ProductProvider>(context, listen: false).fetchData();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    final memberships = Provider.of<MembershipProvider>(context).memberships;
+    final memberships = Provider.of<ProductProvider>(context).memberships;
+
+    // Handle empty memberships
+    if (memberships.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: darkBlueColor,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: whiteColor),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          title: Text(
+            'Membership',
+            style: GoogleFonts.poppins(color: whiteColor),
+          ),
+          elevation: 0,
+        ),
+        body: Center(
+          child: Text(
+            'Opsi Membership Tidak Tersedia',
+            style: GoogleFonts.poppins(fontSize: screenWidth * 0.05),
+          ),
+        ),
+      );
+    }
+
     Membership selectedMembership = memberships.firstWhere(
-        (membership) => membership.id.toString() == _membershipType);
+        (membership) => membership.id.toString() == _membershipType,
+        orElse: () => memberships.first);
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -50,7 +86,7 @@ class _MembershipPageState extends State<MembershipPage> {
                         'Membership',
                         style: GoogleFonts.poppins(
                             color: whiteColor, fontSize: screenWidth * 0.05),
-                      )
+                      ),
                     ],
                   ),
                   SizedBox(
@@ -60,7 +96,7 @@ class _MembershipPageState extends State<MembershipPage> {
                     'Gabung Membership Kami dan Nikmati Keuntungan Eksklusif',
                     style: GoogleFonts.poppins(
                         color: whiteColor, fontSize: screenWidth * 0.03),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -70,13 +106,14 @@ class _MembershipPageState extends State<MembershipPage> {
                 left: screenWidth * 0.02,
               ),
               child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Image.asset(
-                    'assets/images/btn_back.png',
-                    width: screenWidth * 0.12,
-                  )),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Image.asset(
+                  'assets/images/btn_back.png',
+                  width: screenWidth * 0.12,
+                ),
+              ),
             ),
             Container(
               margin: EdgeInsets.only(top: screenHeight * 0.25),
@@ -94,7 +131,7 @@ class _MembershipPageState extends State<MembershipPage> {
                   SizedBox(
                     height: screenHeight * 0.03,
                   ),
-                  // Repeat this block for other benefits
+                  // Benefits section
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -120,9 +157,6 @@ class _MembershipPageState extends State<MembershipPage> {
                       'Potongan harga 20 % untuk Setiap pemesanan',
                       style: GoogleFonts.poppins(fontSize: screenWidth * 0.035),
                     ),
-                  ),
-                  SizedBox(
-                    height: screenHeight * 0.02,
                   ),
                   SizedBox(
                     height: screenHeight * 0.02,
@@ -198,42 +232,15 @@ class _MembershipPageState extends State<MembershipPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                membership.name,
+                                '${membership.name} Bulan',
                                 style: GoogleFonts.poppins(
                                     fontSize: screenWidth * 0.05),
                               ),
-                              if (membership.id ==
-                                  2) // Assuming this is the 3-month membership with a discount
-                                Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: 'Rp.300.000,-',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: screenWidth * 0.04,
-                                          decoration:
-                                              TextDecoration.lineThrough,
-                                          color:
-                                              Colors.red, // Strikethrough color
-                                        ),
-                                      ),
-                                      const TextSpan(
-                                        text: ' ',
-                                      ),
-                                      TextSpan(
-                                        text: 'Rp.200.000,-',
-                                        style: GoogleFonts.poppins(
-                                            fontSize: screenWidth * 0.05),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              else
-                                Text(
-                                  'Rp.${membership.price},-',
-                                  style: GoogleFonts.poppins(
-                                      fontSize: screenWidth * 0.05),
-                                ),
+                              Text(
+                                'Rp.${membership.price},-',
+                                style: GoogleFonts.poppins(
+                                    fontSize: screenWidth * 0.05),
+                              ),
                             ],
                           ),
                           trailing: Row(
@@ -269,9 +276,8 @@ class _MembershipPageState extends State<MembershipPage> {
             context,
             '/checkout',
             arguments: {
-              'id': selectedMembership.id,
+              'product_id': selectedMembership.id,
               'quantity': 1,
-              'booking': false,
             },
           );
         },

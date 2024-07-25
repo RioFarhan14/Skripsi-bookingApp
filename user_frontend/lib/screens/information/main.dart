@@ -6,7 +6,7 @@ import 'package:user_frontend/utils/customAppBar.dart';
 import 'package:user_frontend/utils/theme.dart';
 
 class InformationPage extends StatelessWidget {
-  InformationPage({super.key});
+  const InformationPage({super.key});
 
   @override
   Widget build(BuildContext context) {

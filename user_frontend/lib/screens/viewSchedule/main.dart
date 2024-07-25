@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:user_frontend/providers/allBookingProvider.dart';
-import 'package:user_frontend/providers/fieldProvider.dart';
+import 'package:user_frontend/providers/bookingProvider.dart';
+import 'package:user_frontend/providers/productProvider.dart';
+import 'package:user_frontend/utils/constants.dart';
 import 'package:user_frontend/utils/customAppBar.dart';
 import 'package:user_frontend/utils/customBotton1.dart';
 import 'package:user_frontend/utils/customTextField1.dart';
@@ -11,7 +12,7 @@ import 'package:user_frontend/utils/theme.dart';
 import 'package:user_frontend/utils/timeUtils.dart';
 
 class ViewSchedulePage extends StatefulWidget {
-  const ViewSchedulePage({Key? key});
+  const ViewSchedulePage({Key? key}) : super(key: key);
 
   @override
   State<ViewSchedulePage> createState() => _ViewSchedulePageState();
@@ -23,10 +24,16 @@ class _ViewSchedulePageState extends State<ViewSchedulePage> {
 
   @override
   Widget build(BuildContext context) {
-    final fieldData = Provider.of<FieldProvider>(context);
-    final allBookingProvider =
-        Provider.of<AllBookingProvider>(context); // Perbaikan nama variabel
+    final fieldData = Provider.of<ProductProvider>(context);
+    final bookingProvider =
+        Provider.of<BookingProvider>(context); // Perbaikan nama variabel
     final fields = fieldData.fields;
+    final isLoading = fieldData.isLoading;
+
+    // Memanggil fetchFields jika data belum ada
+    if (fields.isEmpty && !isLoading) {
+      fieldData.fetchData();
+    }
     final sizeHeight = MediaQuery.of(context).size.height;
     final sizeWidth = MediaQuery.of(context).size.width;
 
@@ -54,6 +61,7 @@ class _ViewSchedulePageState extends State<ViewSchedulePage> {
                 itemBuilder: (context, index) {
                   final field = fields[index];
                   final isSelected = _selectedField == field.id;
+                  final imageUrl = '$BASE_URL/images/${field.image}';
                   return GestureDetector(
                     onTap: () {
                       setState(() {
@@ -76,7 +84,7 @@ class _ViewSchedulePageState extends State<ViewSchedulePage> {
                                 top: Radius.circular(sizeWidth * 0.04),
                                 bottom: Radius.circular(sizeWidth * 0.02)),
                             child: Image.network(
-                              field.image,
+                              imageUrl,
                               width: sizeWidth,
                               height: sizeHeight * 0.15,
                               fit: BoxFit.fill,
@@ -121,7 +129,7 @@ class _ViewSchedulePageState extends State<ViewSchedulePage> {
                     title: 'Cari',
                     onPressed: () {
                       if (_selectedField != null && textDate.text.isNotEmpty) {
-                        _showTable(context, allBookingProvider);
+                        _showTable(context, bookingProvider);
                         // Perbaikan nama variabel
                       }
                     },
@@ -142,7 +150,7 @@ class _ViewSchedulePageState extends State<ViewSchedulePage> {
     );
   }
 
-  void _showTable(BuildContext context, AllBookingProvider bookingProvider) {
+  void _showTable(BuildContext context, BookingProvider bookingProvider) async {
     final textDateValue = textDate.text;
     final dateParts = textDateValue.split('-');
 
@@ -161,79 +169,92 @@ class _ViewSchedulePageState extends State<ViewSchedulePage> {
         // Buat string tanggal dengan format "YYYY-MM-DD"
         final selectedDate =
             '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
-        final bookings = bookingProvider.getBookingsByFieldAndDate(
-            _selectedField!, selectedDate);
+        print(_selectedField!);
+        print(selectedDate);
+        try {
+          final bookings = await bookingProvider.fetchBookingsByDate(
+              _selectedField!, selectedDate);
 
-        showModalBottomSheet(
-          context: context,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-                top: Radius.circular(MediaQuery.of(context).size.width * 0.05)),
-          ),
-          builder: (BuildContext context) {
-            return Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.34,
-              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
-              child: SingleChildScrollView(
-                child: DataTable(
-                  columns: [
-                    DataColumn(
-                      label: Text(
-                        'Nama Pemesan',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold,
-                          fontSize: MediaQuery.of(context).size.width * 0.04,
-                        ),
-                      ),
-                    ),
-                    DataColumn(
-                      label: Text(
-                        'Waktu',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold,
-                          fontSize: MediaQuery.of(context).size.width * 0.04,
-                        ),
-                      ),
-                    ),
-                  ],
-                  rows: bookings.map((booking) {
-                    return DataRow(
-                      color: MaterialStateProperty.resolveWith<Color?>(
-                          (Set<MaterialState> states) {
-                        if (bookings.indexOf(booking) % 2 == 0) {
-                          return Colors.grey.withOpacity(0.3);
-                        }
-                        return null;
-                      }),
-                      cells: [
-                        DataCell(
-                          Padding(
-                            padding: EdgeInsets.all(
-                                MediaQuery.of(context).size.width * 0.01),
-                            child: Text(
-                              booking.namaPemesan,
-                              style: GoogleFonts.poppins(fontSize: 14.0),
-                            ),
+          showModalBottomSheet(
+            context: context,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(
+                      MediaQuery.of(context).size.width * 0.05)),
+            ),
+            builder: (BuildContext context) {
+              return Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * 0.34,
+                padding:
+                    EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+                child: SingleChildScrollView(
+                  child: DataTable(
+                    columns: [
+                      DataColumn(
+                        label: Text(
+                          'Nama Pemesan',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold,
+                            fontSize: MediaQuery.of(context).size.width * 0.04,
                           ),
                         ),
-                        DataCell(
-                          Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(
-                              booking.waktu,
-                              style: GoogleFonts.poppins(fontSize: 14.0),
-                            ),
+                      ),
+                      DataColumn(
+                        label: Text(
+                          'Waktu',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold,
+                            fontSize: MediaQuery.of(context).size.width * 0.04,
                           ),
                         ),
-                      ],
-                    );
-                  }).toList(), // Tambahkan .toList() pada hasil map
+                      ),
+                    ],
+                    rows: bookings.map((booking) {
+                      return DataRow(
+                        color: WidgetStateProperty.resolveWith<Color?>(
+                            (Set<WidgetState> states) {
+                          if (bookings.indexOf(booking) % 2 == 0) {
+                            return Colors.grey.withOpacity(0.3);
+                          }
+                          return null;
+                        }),
+                        cells: [
+                          DataCell(
+                            Padding(
+                              padding: EdgeInsets.all(
+                                  MediaQuery.of(context).size.width * 0.01),
+                              child: Text(
+                                booking.client_name ?? '',
+                                style: GoogleFonts.poppins(fontSize: 14.0),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                '${booking.start_time} - ${booking.end_time}',
+                                style: GoogleFonts.poppins(fontSize: 14.0),
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    }).toList(), // Tambahkan .toList() pada hasil map
+                  ),
                 ),
-              ),
-            );
-          },
-        );
+              );
+            },
+          );
+        } catch (e) {
+          // Tangani error jika ada
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Gagal memuat data: $e'),
+            ),
+          );
+        }
       }
     }
   }

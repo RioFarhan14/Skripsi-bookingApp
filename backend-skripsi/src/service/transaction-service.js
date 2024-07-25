@@ -31,7 +31,7 @@ const getAllTransaction = async (user_id) => {
   return prismaClient.transaction.findMany();
 };
 
-const getUserTransaction = async (user_id) => {
+const getUserHistoryTransaction = async (user_id) => {
   user_id = validate(getTransactionValidation, user_id);
 
   const checkUserInDatabase = await validateUser(user_id);
@@ -43,6 +43,23 @@ const getUserTransaction = async (user_id) => {
   return prismaClient.transaction.findMany({
     where: {
       user_id: user_id,
+      OR: [{ status: "PAID" }, { status: "CANCELLED" }],
+    },
+    select: {
+      transaction_date: true,
+      status: true,
+      payment: true,
+      transaction_date: true,
+      transaction_details: {
+        select: {
+          product: {
+            select: {
+              product_name: true,
+              product_type: true,
+            },
+          },
+        },
+      },
     },
   });
 };
@@ -94,8 +111,29 @@ const create = async (request) => {
   return result;
 };
 
+const update = async (request) => {
+  const result = await prismaClient.booking.update({
+    where: {
+      booking_id: request.orderId,
+    },
+    data: {
+      status: request.status,
+    },
+  });
+
+  if (result) {
+    prismaClient.transaction.update({
+      where: { transaction_id: request.orderId },
+      data: {
+        status: request.status,
+      },
+    });
+  }
+};
+
 export default {
   getAllTransaction,
-  getUserTransaction,
+  getUserHistoryTransaction,
+  update,
   create,
 };

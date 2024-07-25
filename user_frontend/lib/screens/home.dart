@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:user_frontend/widgets/buttonMenu.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class HomePage extends StatelessWidget {
           SizedBox(
             height: screenHeight * 0.02,
           ),
-          Container(
+          SizedBox(
               height: screenHeight * 0.2,
               width: screenWidth * 0.9,
               child: Image.asset(

@@ -44,10 +44,6 @@ userRouter.delete("/api/users/help", helpController.deleteHelp);
 //BookingService
 userRouter.get("/api/users/booking", bookingController.getAllBooking);
 userRouter.get(
-  "/api/users/booking/:booking_id",
-  bookingController.getBookingById
-);
-userRouter.get(
   "/api/users/bookings",
   bookingController.getBookingByProductAndDate
 );
@@ -58,7 +54,10 @@ userRouter.delete("/api/users/booking", bookingController.deleteBooking);
 
 //TransactionService
 userRouter.get("/api/users/transaction", transactionController.getAll);
-userRouter.get("/api/users/current/transaction", transactionController.getUser);
+userRouter.get(
+  "/api/users/current/transaction",
+  transactionController.getUserHistory
+);
 userRouter.post("/api/users/transaction", transactionController.create);
 
 export { userRouter };

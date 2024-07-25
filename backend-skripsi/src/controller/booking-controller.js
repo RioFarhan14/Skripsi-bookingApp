@@ -11,20 +11,6 @@ const getAllBooking = async (req, res, next) => {
   }
 };
 
-const getBookingById = async (req, res, next) => {
-  try {
-    const user_id = req.user.user_id;
-    const request = req.query.booking_id;
-    request.user_id = user_id;
-    const result = await bookingService.getBookingById(request);
-    res.status(200).json({
-      data: result,
-    });
-  } catch (e) {
-    next(e);
-  }
-};
-
 const getBookingByProductAndDate = async (req, res, next) => {
   try {
     const user_id = req.user.user_id;
@@ -72,9 +58,9 @@ const update = async (req, res, next) => {
     const user_id = req.user.user_id;
     const request = req.body;
     request.user_id = user_id;
-    await bookingService.update(request);
+    const result = await bookingService.update(request);
     res.status(200).json({
-      data: "Berhasil diubah",
+      data: result,
     });
   } catch (e) {
     next(e);
@@ -96,7 +82,6 @@ const deleteBooking = async (req, res, next) => {
 };
 
 export default {
-  getBookingById,
   getAllBooking,
   getBookingByProductAndDate,
   getUserBooking,

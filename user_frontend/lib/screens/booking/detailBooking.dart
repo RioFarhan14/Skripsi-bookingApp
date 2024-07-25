@@ -192,15 +192,16 @@ class _DetailBookingPageState extends State<DetailBookingPage> {
                     height: screenHeight * 0.03,
                   ),
                   CustomButton1(
-                    title: 'Pesan',
+                    title: 'Checkout',
                     onPressed: () {
                       if (textDate.text.isNotEmpty &&
                           textTime.text.isNotEmpty &&
                           textDuration.text.isNotEmpty) {
                         Navigator.pushNamed(context, '/checkout', arguments: {
-                          'id': field.id,
-                          'quantity': textDuration.text,
-                          'booking': true
+                          'product_id': field.id,
+                          'start_time': textTime.text,
+                          'booking_date': textDate.text,
+                          'duration': textDuration.text,
                         });
                       } else {
                         showErrorDialog(

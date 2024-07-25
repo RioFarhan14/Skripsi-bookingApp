@@ -48,8 +48,8 @@ class _ActivityPageState extends State<ActivityPage> {
                 width: screenWidth * 0.85,
                 height: screenHeight * 0.63,
                 child: _selectedIndex == 0
-                    ? StatusBooking()
-                    : HistoryTransaction()),
+                    ? const StatusBooking()
+                    : const HistoryTransaction()),
           ),
         ),
       ],

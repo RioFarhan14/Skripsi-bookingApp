@@ -56,7 +56,7 @@ void _showErrorDialog(BuildContext context) {
               FontAwesomeIcons.triangleExclamation,
               color: Colors.red,
             ),
-            SizedBox(width: 13),
+            const SizedBox(width: 13),
             Text(
               'Peringatan',
               style: GoogleFonts.poppins(color: Colors.red),

@@ -7,7 +7,7 @@ import 'package:user_frontend/utils/customAppBar.dart';
 import 'package:user_frontend/utils/theme.dart';
 
 class BookingFieldPage extends StatelessWidget {
-  BookingFieldPage({super.key});
+  const BookingFieldPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class BookingFieldPage extends StatelessWidget {
 
     // Memanggil fetchFields jika data belum ada
     if (fields.isEmpty && !isLoading) {
-      productProvider.fetchFields();
+      productProvider.fetchData();
     }
 
     return Scaffold(
@@ -30,7 +30,7 @@ class BookingFieldPage extends StatelessWidget {
         child: const CustomAppBar(title: 'Pilih Lapangan'),
       ),
       body: isLoading
-          ? Center(
+          ? const Center(
               child:
                   CircularProgressIndicator()) // Menampilkan loading indicator
           : Center(

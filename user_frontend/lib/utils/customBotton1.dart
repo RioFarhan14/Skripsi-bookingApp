@@ -24,14 +24,14 @@ class CustomButton1 extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
     return ElevatedButton(
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(backgroundColor),
-        fixedSize: MaterialStateProperty.all<Size>(
+        backgroundColor: WidgetStateProperty.all<Color>(backgroundColor),
+        fixedSize: WidgetStateProperty.all<Size>(
           Size(
               screenWidth * buttonWidth,
               screenHeight *
                   buttonHeight), // Lebar 80% dan tinggi 6% dari layar
         ),
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+        shape: WidgetStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(screenWidth * 0.03),
           ),

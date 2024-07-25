@@ -2,6 +2,11 @@ import midtransClient from "midtrans-client";
 import { MIDTRANS_CLIENT_KEY, MIDTRANS_SECRET_KEY } from "../utils/constant.js";
 import { ResponseError } from "../error/response-error.js";
 import { prismaClient } from "../application/database.js";
+import crypto from "crypto";
+import {
+  updateTransactionFail,
+  updateTransactionSuccess,
+} from "../helpers/transactionHelpers.js";
 
 const snap = new midtransClient.Snap({
   isProduction: false,
@@ -49,4 +54,63 @@ const updateTransactionMidtrans = async (
   return result;
 };
 
-export default { createTransaction, updateTransactionMidtrans };
+const updateNotificationStatusOnMidtrans = async (request) => {
+  const checkTransaction = await prismaClient.transaction.findUnique({
+    where: {
+      transaction_id: request.order_id,
+    },
+  });
+
+  if (!checkTransaction) {
+    return;
+  }
+
+  const hash = crypto
+    .createHash("sha512")
+    .update(
+      `${checkTransaction.transaction_id}${request.status_code}${request.gross_amount}${MIDTRANS_SECRET_KEY}`
+    )
+    .digest("hex");
+
+  if (request.signature_key !== hash) {
+    return {
+      status: "error",
+      message: "Invalid Signature Key",
+    };
+  }
+
+  let responseData = null;
+  let transactionStatus = request.transaction_status;
+  let fraudStatus = request.fraud_status;
+
+  if (transactionStatus == "capture") {
+    if (fraudStatus == "accept") {
+      await updateTransactionSuccess(
+        checkTransaction.transaction_id,
+        request.payment_type
+      );
+    }
+  } else if (transactionStatus == "settlement") {
+    await updateTransactionSuccess(
+      checkTransaction.transaction_id,
+      request.payment_type
+    );
+  } else if (
+    transactionStatus == "cancel" ||
+    transactionStatus == "deny" ||
+    transactionStatus == "expire"
+  ) {
+    await updateTransactionFail(checkTransaction.transaction_id);
+  }
+
+  return {
+    status: "success",
+    message: "Berhasil Update",
+  };
+};
+
+export default {
+  createTransaction,
+  updateTransactionMidtrans,
+  updateNotificationStatusOnMidtrans,
+};

@@ -13,7 +13,7 @@ void showErrorDialog(BuildContext context, String title, String message) {
               FontAwesomeIcons.triangleExclamation,
               color: Colors.red,
             ),
-            SizedBox(width: 13),
+            const SizedBox(width: 13),
             Text(
               title,
               style: GoogleFonts.poppins(color: Colors.red),

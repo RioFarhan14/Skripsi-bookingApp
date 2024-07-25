@@ -42,17 +42,6 @@ describe("GET /api/users/booking", function () {
     expect(result.body.data).toBeInstanceOf(Object);
   });
 
-  it("should can get bookingById", async () => {
-    const date = getFormattedDate();
-    const result = await supertest(web)
-      .get("/api/users/booking?booking_id=001001${date}")
-      .set("Authorization", "admin");
-
-    logger.info(result.body);
-    expect(result.status).toBe(200);
-    expect(result.body.data).toBeInstanceOf(Object);
-  });
-
   it("should can get bookingByDate", async () => {
     const result = await supertest(web)
       .get("/api/users/bookings")
@@ -218,7 +207,7 @@ describe("PATCH /api/users/booking", function () {
       });
 
     expect(result.status).toBe(200);
-    expect(result.body.data).toBe("Berhasil diubah");
+    expect(result.body.data).toBeInstanceOf(Object);
   });
 
   it("should reject update if token invalid", async () => {

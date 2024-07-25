@@ -12,8 +12,9 @@ import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
 import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
-import { validateUser } from "../utils/validate.js";
+import { validateMembership, validateUser } from "../utils/validate.js";
 import { generateUserId, validateInput } from "../helpers/userHelper.js";
+import { getCurrentTime } from "../utils/timeUtils.js";
 
 const register = async (request) => {
   const user = validate(registerUserValidation, request);
@@ -162,6 +163,14 @@ const login = async (request) => {
 
 const get = async (user_id) => {
   user_id = validate(getUserValidation, user_id);
+
+  const currentTime = getCurrentTime();
+  let isMember = await validateMembership(user_id, currentTime);
+  if (isMember) {
+    isMember = true;
+  } else {
+    false;
+  }
   const user = await prismaClient.user.findUnique({
     where: {
       user_id: user_id,
@@ -176,6 +185,7 @@ const get = async (user_id) => {
   if (!user) {
     throw new ResponseError(404, "user tidak ditemukan");
   }
+  user.isMember = isMember;
   return user;
 };
 
