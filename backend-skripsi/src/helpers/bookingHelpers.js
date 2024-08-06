@@ -1,6 +1,6 @@
 import { prismaClient } from "../application/database.js";
 import { ResponseError } from "../error/response-error.js";
-import { getCurrentTime } from "../utils/timeUtils.js";
+import { formattedDate, getCurrentTime } from "../utils/timeUtils.js";
 import moment from "moment-timezone";
 
 const calculateEndTime = (startTime, duration) => {
@@ -26,7 +26,7 @@ const calculateEndTime = (startTime, duration) => {
 // Memvalidasi booking_date dan start_time
 const isValidBooking = (bookingDateStr, startTimeStr) => {
   // Mendapatkan waktu saat ini
-  const now = getCurrentTime();
+  const now = formattedDate(getCurrentTime(), "YYYY-MM-DD HH:mm");
 
   // Mengonversi booking_date dan start_time ke moment objects
   const bookingDateTime = moment.tz(
@@ -35,7 +35,7 @@ const isValidBooking = (bookingDateStr, startTimeStr) => {
   );
 
   // Memeriksa apakah bookingDateTime tidak kurang dari waktu saat ini
-  return bookingDateTime.isSameOrAfter(now);
+  return bookingDateTime.isAfter(now);
 };
 
 const validateSchedule = async (data) => {

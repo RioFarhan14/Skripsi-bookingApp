@@ -23,6 +23,20 @@ function getDuration(startTime, endTime) {
   return hours;
 }
 
+function getDurationMinute(startTime, endTime) {
+  // Mengonversi string ke objek waktu dengan timezone Jakarta
+  const start = moment.tz(startTime, "HH:mm", "Asia/Jakarta");
+  const end = moment.tz(endTime, "HH:mm", "Asia/Jakarta");
+
+  // Menghitung durasi dalam menit
+  const duration = moment.duration(end.diff(start));
+
+  // Mengembalikan durasi dalam format jam
+  const hours = Math.floor(duration.asMinutes());
+
+  return hours;
+}
+
 function getEndDate(start_date, days) {
   const endDate = moment.tz(start_date, "YYYY-MM-DD HH:mm", "Asia/Jakarta");
 
@@ -41,4 +55,22 @@ function getEndTime(startTime, duration) {
   // Mengembalikan end_time dalam format 'HH:mm'
   return start.format("HH:mm");
 }
-export { getCurrentTime, formattedDate, getDuration, getEndTime, getEndDate };
+function plusTime(startTime, duration) {
+  // Mengonversi startTime ke objek waktu dengan timezone Jakarta
+  const start = moment.tz(startTime, "HH:mm", "Asia/Jakarta");
+
+  // Menambahkan durasi (menit) ke start time
+  start.add(duration, "minute");
+
+  // Mengembalikan dalam format 'HH:mm'
+  return start.format("HH:mm");
+}
+export {
+  getCurrentTime,
+  formattedDate,
+  getDuration,
+  getDurationMinute,
+  getEndTime,
+  getEndDate,
+  plusTime,
+};

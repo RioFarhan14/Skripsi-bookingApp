@@ -18,6 +18,8 @@ model User {
   memberships Membership[]
   bookings Booking[]
   transactions Transaction[]
+  notifications Notification[]
+  notificationreads NotificationRead[]
   @@map("users")
 }
 
@@ -51,6 +53,7 @@ model Booking {
   booking_date String @db.VarChar(10)
   start_time String @db.VarChar(5)
   end_time String @db.VarChar(5)
+  notification_sent Boolean @default(false)
   transaction Transaction? 
   user User @relation(fields: [user_id], references: [user_id])
   product Product @relation(fields: [product_id], references: [product_id])
@@ -59,7 +62,7 @@ model Booking {
 
 model Transaction {
   transaction_id String @id @db.VarChar(12)
-  user_id String
+  user_id String @db.VarChar(11)
   booking_id String? @unique
   transaction_date DateTime
   payment String? @db.VarChar(20)
@@ -74,8 +77,35 @@ model Transaction {
   @@map("transactions")
 }
 
+model Notification{
+  notification_id Int @id @default(autoincrement())
+  user_id String? @db.VarChar(11)
+  category_id Int
+  title String @db.VarChar(50)
+  message String @db.VarChar(255)
+  time DateTime @default(now())
+  user User? @relation(fields: [user_id], references: [user_id])
+  category CategoryOnNotification @relation(fields: [category_id], references: [category_id])
+  notificationreads NotificationRead[]
+  @@map("notifications")
+}
 
+model CategoryOnNotification{
+  category_id Int @id @default(autoincrement())
+  category_name String @db.VarChar(10)
+  notifications Notification[]
+@@map("Category_on_notifications")
+}
 
+model NotificationRead {
+id Int @id @default(autoincrement())
+is_read Boolean
+notification_id Int
+user_id String @db.VarChar(11)
+user User @relation(fields: [user_id], references: [user_id])
+notifications Notification @relation(fields: [notification_id], references: [notification_id])
+@@map("notification_reads")
+}
 
 model Transaction_detail {
   transaction_detail_id Int @id @default(autoincrement())

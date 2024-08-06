@@ -6,6 +6,7 @@ import helpController from "../controller/help-controller.js";
 import bookingController from "../controller/booking-controller.js";
 import transactionController from "../controller/transaction-controller.js";
 import multerMiddleware from "../middleware/multer-middleware.js";
+import notificationController from "../controller/notification-controller.js";
 
 const userRouter = new express.Router();
 userRouter.use(authMiddleware);
@@ -59,5 +60,17 @@ userRouter.get(
   transactionController.getUserHistory
 );
 userRouter.post("/api/users/transaction", transactionController.create);
+
+//NotificationService
+userRouter.post("/api/users/notification", notificationController.create);
+userRouter.post(
+  "/api/users/notification/category",
+  notificationController.createCategoryNotif
+);
+userRouter.get("/api/users/notification", notificationController.get);
+userRouter.post(
+  "/api/users/notificationRead",
+  notificationController.notifIsRead
+);
 
 export { userRouter };

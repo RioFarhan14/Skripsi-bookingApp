@@ -4,10 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:user_frontend/providers/FaqProvider.dart';
 import 'package:user_frontend/providers/authProvider.dart';
 import 'package:user_frontend/providers/bookingProvider.dart';
-import 'package:user_frontend/providers/fieldProvider.dart';
-import 'package:user_frontend/providers/helpProvider.dart';
-import 'package:user_frontend/providers/historyProvider.dart';
-import 'package:user_frontend/providers/informationProvider.dart';
+import 'package:user_frontend/providers/notifProvider.dart';
 import 'package:user_frontend/providers/productProvider.dart';
 import 'package:user_frontend/providers/transactionProvider.dart';
 import 'package:user_frontend/services/faq-service.dart';
@@ -35,10 +32,7 @@ class MyApp extends StatelessWidget {
             create: (_) => TransactionProvider(TransactionService())),
         ChangeNotifierProvider(create: (_) => FaqProvider(FaqService())),
         ChangeNotifierProvider(create: (_) => BookingProvider()),
-        ChangeNotifierProvider(create: (_) => HistoryProvider()),
-        ChangeNotifierProvider(create: (_) => FieldProvider()),
-        ChangeNotifierProvider(create: (_) => HelpProvider()),
-        ChangeNotifierProvider(create: (_) => InformationProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,

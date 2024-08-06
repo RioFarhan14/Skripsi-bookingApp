@@ -7,6 +7,7 @@ import 'package:user_frontend/screens/booking/detailBooking.dart';
 import 'package:user_frontend/screens/booking/main.dart';
 import 'package:user_frontend/screens/checkout.dart';
 import 'package:user_frontend/screens/help/main.dart';
+import 'package:user_frontend/screens/information/detail-notification.dart';
 import 'package:user_frontend/screens/information/main.dart';
 import 'package:user_frontend/screens/login.dart';
 import 'package:user_frontend/screens/menuNavigation.dart';
@@ -60,6 +61,10 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case '/information':
       return MaterialPageRoute(
           builder: (_) => const AuthGuard(child: InformationPage()));
+    case '/detailInfo':
+      return MaterialPageRoute(
+          builder: (_) => const AuthGuard(child: DetailNotification()),
+          settings: settings);
     case '/booking':
       return MaterialPageRoute(
           builder: (_) => const AuthGuard(child: BookingFieldPage()));

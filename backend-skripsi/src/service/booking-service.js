@@ -174,12 +174,14 @@ const createBooking = async (request) => {
     },
   });
 
-  const result = {};
-  result.booking_id = data.booking_id;
-  result.user_id_token = data.user_id_token;
-  result.user_id = data.user_id;
-  result.product_id = data.product_id;
-  result.quantity = data.duration;
+  const result = {
+    booking_id: data.booking_id,
+    user_id_token: data.user_id_token,
+    user_id: data.user_id,
+    product_id: data.product_id,
+    quantity: data.duration,
+  };
+
   return result;
 };
 
@@ -231,13 +233,26 @@ const update = async (request) => {
 
   const { user_id, ...otherData } = user;
 
-  const data = { ...otherData };
+  const data = { ...otherData, notification_sent: false };
 
   return prismaClient.booking.update({
     where: {
       booking_id: data.booking_id,
     },
     data: data,
+    select: {
+      booking_id: true,
+      product_id: true,
+      transaction: {
+        select: {
+          snap_token: true,
+        },
+      },
+      status: true,
+      booking_date: true,
+      start_time: true,
+      end_time: true,
+    },
   });
 };
 

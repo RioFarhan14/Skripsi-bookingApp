@@ -324,7 +324,8 @@ class _ChangeScheduleState extends State<ChangeSchedule> {
 
     if (newTime != null) {
       setState(() {
-        selectedTime = newTime.format(context); // Format waktu ke string
+        selectedTime =
+            '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}'; // Format waktu ke string
       });
     }
   }
